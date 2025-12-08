@@ -65,7 +65,9 @@ async function renderDashboard(container, user) {
                     <input type="text" id="post-title" placeholder="Article Title" required>
                     <input type="text" id="post-cat" placeholder="Category">
                     
-                    <div id="editor-container" style="height: 400px; background:white; color:black;"></div>
+                    <div id="editor-wrapper">
+                        <div id="editor-container"></div>
+                    </div>
                     
                     <div style="margin-top: 2rem; display:flex; gap:1rem;">
                         <button type="submit" class="btn-primary">Save / Publish</button>

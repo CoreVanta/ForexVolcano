@@ -261,3 +261,68 @@ footer {
     color: #ff4757;
     margin-top: 1rem;
 }
+
+/* --- Editor Customization --- */
+#editor-wrapper {
+    margin-top: 2rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: var(--border-glass);
+    overflow: hidden;
+}
+
+/* Toolbar */
+.ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: var(--border-glass) !important;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.ql-snow .ql-stroke {
+    stroke: var(--text-muted) !important;
+}
+
+.ql-snow .ql-fill {
+    fill: var(--text-muted) !important;
+}
+
+.ql-snow .ql-picker.ql-header .ql-picker-label::before {
+    color: var(--text-muted) !important;
+}
+
+/* Editor Area */
+.ql-container.ql-snow {
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.1rem !important;
+    min-height: 500px;
+    color: var(--text-main) !important;
+}
+
+.ql-editor.ql-blank::before {
+    color: rgba(255, 255, 255, 0.3) !important;
+    font-style: italic;
+}
+
+/* Inputs in Editor Form */
+#post-form input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+    padding: 1rem 0;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+#post-form input:focus {
+    box-shadow: none;
+    border-bottom-color: var(--primary);
+}
+
+#post-title {
+    font-size: 2rem !important;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: white;
+}
