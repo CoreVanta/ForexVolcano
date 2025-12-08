@@ -71,7 +71,6 @@ async function renderDashboard(container, user) {
                     
                     <div style="margin-top: 2rem; display:flex; gap:1rem;">
                         <button type="submit" class="btn-primary">Save / Publish</button>
-                         <button type="button" id="upload-media-btn" class="btn-secondary">Upload Image/Video</button>
                         <button type="button" id="cancel-edit" class="btn-secondary">Cancel</button>
                     </div>
                 </form>
@@ -90,89 +89,6 @@ async function renderDashboard(container, user) {
                 </div>
             </div>
         </div>
-    `;
-
-    // Initialize Quill
-    if (!quill) {
-        quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'Write your masterpiece...',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                    ['link', 'image', 'video'],
-                    ['clean']
-                ]
-            }
-        });
-    }
-
-    // Events
-    document.getElementById('logout-btn').addEventListener('click', () => logoutUser());
-    document.getElementById('create-new-btn').addEventListener('click', () => openEditor());
-    document.getElementById('show-list-btn').addEventListener('click', () => showList());
-    document.getElementById('cancel-edit').addEventListener('click', () => showList());
-
-    // GitHub Settings Logic
-    const ghModal = document.getElementById('gh-modal');
-    document.getElementById('gh-settings-btn').addEventListener('click', () => {
-        document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || '';
-        document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
-        ghModal.style.display = 'block';
-    });
-
-    document.getElementById('save-gh-btn').addEventListener('click', () => {
-        const repo = document.getElementById('gh-repo').value.trim();
-        const token = document.getElementById('gh-token').value.trim();
-        if (repo && token) {
-            localStorage.setItem('gh_repo', repo);
-            localStorage.setItem('gh_token', token);
-            alert('Settings Saved!');
-            ghModal.style.display = 'none';
-        } else {
-            alert('Please fill both fields');
-        }
-    });
-
-    document.getElementById('close-gh-btn').addEventListener('click', () => ghModal.style.display = 'none');
-
-    // Upload Logic
-    const mediaInput = document.getElementById('media-input');
-    document.getElementById('upload-media-btn').addEventListener('click', () => mediaInput.click());
-
-    mediaInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const repo = localStorage.getItem('gh_repo');
-        const token = localStorage.getItem('gh_token');
-
-        if (!repo || !token) {
-            alert("Please configure GitHub Settings first!");
-            ghModal.style.display = 'block';
-            return;
-        }
-
-        try {
-            const url = await uploadToGitHub(file, token, repo);
-            const range = quill.getSelection(true) || { index: quill.getLength() };
-            if (file.type.startsWith('video')) {
-                quill.insertEmbed(range.index, 'video', url);
-            } else {
-                quill.insertEmbed(range.index, 'image', url);
-            }
-        } catch (err) {
-            alert("Upload failed: " + err.message);
-        }
-    });
-
-    // Form Submit
-    document.getElementById('post-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const data = {
             title: document.getElementById('post-title').value,
             category: document.getElementById('post-cat').value,
             content: quill.root.innerHTML,
@@ -205,7 +121,7 @@ async function refreshList() {
     }
 
     table.innerHTML = posts.map(p => `
-        <div class="post-card" style="display:flex; justify-content:space-between; align-items:center; opacity: ${p.published ? 1 : 0.5}">
+        < div class="post-card" style = "display:flex; justify-content:space-between; align-items:center; opacity: ${p.published ? 1 : 0.5}" >
             <div>
                 <h4 style="margin:0">${p.title} ${p.published ? '' : '(HIDDEN)'}</h4>
                 <small style="color:var(--text-muted)">${new Date(p.date?.seconds * 1000).toLocaleDateString()}</small>
@@ -217,8 +133,8 @@ async function refreshList() {
                 </button>
                 <button class="btn-secondary btn-sm" style="background:red" onclick="window.delPost('${p.id}')">Delete</button>
             </div>
-        </div>
-    `).join('');
+        </div >
+        `).join('');
 }
 
 window.editPost = async (id) => {
@@ -228,7 +144,7 @@ window.editPost = async (id) => {
 };
 
 window.togglePub = async (id, status) => {
-    if (confirm(`Set visibility to ${status}?`)) {
+    if (confirm(`Set visibility to ${ status }?`)) {
         await updatePost(id, { published: status });
         refreshList();
     }
