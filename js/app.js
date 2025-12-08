@@ -5,11 +5,19 @@ const content = document.getElementById('main-content');
 let allPostsCache = [];
 
 // View: Home
-async function homeView() {
+async function homeView(categoryFilter = null) {
+    const titleText = categoryFilter
+        ? `Category: <span style="color:var(--primary)">${decodeURIComponent(categoryFilter)}</span>`
+        : `Future <span style="background: var(--gradient-main); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Unleashed</span>`;
+
+    const subText = categoryFilter
+        ? `<a href="#home" style="color:var(--text-main); text-decoration:underline">Back to all posts</a>`
+        : `Exploring the boundaries of technology and design.`;
+
     content.innerHTML = `
         <header class="hero" style="text-align: center; margin-bottom: 3rem;">
-            <h1>Future <span style="background: var(--gradient-main); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Unleashed</span></h1>
-            <p style="color: var(--text-muted)">Exploring the boundaries of technology and design.</p>
+            <h1>${titleText}</h1>
+            <p style="color: var(--text-muted)">${subText}</p>
         </header>
         
         <div class="search-container">
@@ -23,12 +31,21 @@ async function homeView() {
 
     const posts = await getPosts();
     allPostsCache = posts;
-    renderPosts(posts);
+
+    // Initial Filter
+    let displayPosts = posts;
+    if (categoryFilter) {
+        displayPosts = posts.filter(p => p.category === decodeURIComponent(categoryFilter));
+    }
+
+    renderPosts(displayPosts);
 
     // Search Listener
     document.getElementById('search-input').addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        const filtered = allPostsCache.filter(post =>
+        const initialSet = categoryFilter ? posts.filter(p => p.category === decodeURIComponent(categoryFilter)) : posts;
+
+        const filtered = initialSet.filter(post =>
             post.title.toLowerCase().includes(query) ||
             (post.category && post.category.toLowerCase().includes(query))
         );
@@ -50,6 +67,26 @@ function renderPosts(posts) {
             <a href="#post/${post.id}" class="read-more" style="color: var(--primary)">Read Article &rarr;</a>
         </article>
     `).join('');
+}
+
+// View: Categories
+async function categoriesView() {
+    content.innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+    const posts = await getPosts();
+    const categories = [...new Set(posts.map(p => p.category))].filter(Boolean);
+
+    content.innerHTML = `
+        <header class="hero" style="text-align: center; margin-bottom: 3rem;">
+            <h1>Browse <span style="color: var(--accent);">Categories</span></h1>
+        </header>
+        <div class="posts-grid">
+            ${categories.map(cat => `
+                <a href="#category/${cat}" class="post-card" style="text-align:center; display:flex; align-items:center; justify-content:center; min-height:150px; text-decoration:none;">
+                    <h3 style="color:var(--primary); font-size:1.5rem; margin:0;">${cat}</h3>
+                </a>
+            `).join('') || '<p style="text-align:center; width:100%">No categories found.</p>'}
+        </div>
+     `;
 }
 
 // View: Single Post
@@ -86,8 +123,9 @@ function adminView() {
 
 // Router Logic
 const routes = {
-    'home': homeView,
-    'admin': adminView
+    'home': () => homeView(),
+    'admin': adminView,
+    'categories': categoriesView
 };
 
 async function router() {
@@ -101,12 +139,24 @@ async function router() {
         return;
     }
 
+    if (hash.startsWith('category/')) {
+        const cat = hash.split('/')[1];
+        await homeView(cat);
+        updateNav('categories');
+        return;
+    }
+
     const baseRoute = hash.split('/')[0];
 
     updateNav(baseRoute);
 
     const viewFn = routes[baseRoute] || routes['home'];
-    await viewFn();
+    try {
+        await viewFn();
+    } catch (e) {
+        console.error(e);
+        document.getElementById('main-content').innerHTML = `<div class="error-msg" style="text-align:center"><h3>Error Loading Page</h3><p>${e.message}</p></div>`;
+    }
 }
 
 function updateNav(route) {
@@ -117,6 +167,15 @@ function updateNav(route) {
         }
     });
 }
+
+// Global Error Handler for debugging
+window.onerror = function (msg, url, line) {
+    const errDiv = document.createElement('div');
+    errDiv.style.cssText = 'position:fixed; bottom:0; left:0; width:100%; background:red; color:white; padding:10px; z-index:9999; text-align:center;';
+    errDiv.textContent = `System Error: ${msg}`;
+    document.body.appendChild(errDiv);
+    return false;
+};
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);
