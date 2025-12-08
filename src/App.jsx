@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import Analysis from './pages/Analysis';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
 // Placeholder Components
-const Analysis = () => <div className="p-8 text-center text-2xl pt-24">Market Analysis Page</div>;
 const News = () => <div className="p-8 text-center text-2xl pt-24">Market News Page</div>;
 const Login = () => <div className="p-8 text-center text-2xl pt-24">Login Page</div>;
 const Register = () => <div className="p-8 text-center text-2xl pt-24">Register Page</div>;
