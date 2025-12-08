@@ -4,12 +4,13 @@ import { getFirestore } from "firebase/firestore";
 
 // TODO: Replace with your actual Firebase configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyB3nTJlyM3K-XpvEUrXyk3leiVeMxzkTiU",
+    authDomain: "forexvolcano-21180.firebaseapp.com",
+    projectId: "forexvolcano-21180",
+    storageBucket: "forexvolcano-21180.firebasestorage.app",
+    messagingSenderId: "264687169302",
+    appId: "1:264687169302:web:83322d7adc303b1f0c2a37",
+    measurementId: "G-XTB0D1TPS6"
 };
 
 const app = initializeApp(firebaseConfig);
