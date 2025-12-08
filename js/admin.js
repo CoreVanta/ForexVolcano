@@ -1,4 +1,7 @@
-import { loginUser, logoutUser, createPost, onAuth } from './db.js';
+import { loginUser, logoutUser, createPost, updatePost, deletePost, getPosts, uploadToGitHub, onAuth } from './db.js';
+
+let quill;
+let currentEditingId = null;
 
 export function initAdmin(container) {
     onAuth(user => {
@@ -25,69 +28,238 @@ function renderLoginForm(container) {
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        const errorMsg = document.getElementById('login-error');
-
         try {
-            await loginUser(email, pass);
+            await loginUser(document.getElementById('email').value, document.getElementById('password').value);
         } catch (error) {
-            errorMsg.textContent = "Login failed: " + error.message;
+            document.getElementById('login-error').textContent = error.message;
         }
     });
 }
 
-function renderDashboard(container, user) {
+async function renderDashboard(container, user) {
     container.innerHTML = `
         <div class="dashboard">
             <header class="dash-header">
-                <h3>Welcome, ${user.email}</h3>
-                <button id="logout-btn" class="btn-secondary">Logout</button>
+                <h3>Admin: ${user.email}</h3>
+                <div>
+                   <button id="gh-settings-btn" class="btn-secondary" style="margin-right:1rem">GitHub Settings</button>
+                   <button id="show-list-btn" class="btn-secondary" style="margin-right:1rem">Manage Posts</button>
+                   <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
             </header>
             
-            <div class="dash-actions">
-                <button id="new-post-btn" class="btn-primary">+ New Post</button>
+            <!-- List View -->
+            <div id="posts-list-view">
+                <div class="dash-actions">
+                    <button id="create-new-btn" class="btn-primary">+ Create New Article</button>
+                </div>
+                <div id="admin-posts-table" class="posts-grid" style="grid-template-columns: 1fr; gap: 1rem; margin-top:2rem;">
+                    <p>Loading...</p>
+                </div>
             </div>
-            
-            <div id="editor-container" style="display:none;">
-                <h4>Create Post</h4>
+
+            <!-- Editor View -->
+            <div id="editor-view" style="display:none;">
+                <h4 id="editor-title">Create Article</h4>
                 <form id="post-form">
-                    <input type="text" id="post-title" placeholder="Title" required>
+                    <input type="text" id="post-title" placeholder="Article Title" required>
                     <input type="text" id="post-cat" placeholder="Category">
-                    <textarea id="post-content" rows="10" placeholder="Write something amazing..."></textarea>
-                    <button type="submit" class="btn-primary">Publish</button>
-                    <button type="button" id="cancel-post" class="btn-secondary">Cancel</button>
+                    
+                    <div id="editor-container" style="height: 400px; background:white; color:black;"></div>
+                    
+                    <div style="margin-top: 2rem; display:flex; gap:1rem;">
+                        <button type="submit" class="btn-primary">Save / Publish</button>
+                         <button type="button" id="upload-media-btn" class="btn-secondary">Upload Image/Video</button>
+                        <button type="button" id="cancel-edit" class="btn-secondary">Cancel</button>
+                    </div>
                 </form>
+                <input type="file" id="media-input" style="display:none" accept="image/*,video/*">
+            </div>
+
+            <!-- GitHub Settings Modal -->
+            <div id="gh-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000;">
+                <div class="login-card">
+                    <h3>GitHub Upload Settings</h3>
+                    <p style="font-size:0.9rem; color:var(--text-muted)">Required for image uploads. Token is saved locally.</p>
+                    <input type="text" id="gh-repo" placeholder="username/repo-name">
+                    <input type="password" id="gh-token" placeholder="Personal Access Token (Repo Scope)">
+                    <button id="save-gh-btn" class="btn-primary">Save Settings</button>
+                    <button id="close-gh-btn" class="btn-secondary" style="margin-top:1rem">Close</button>
+                </div>
             </div>
         </div>
     `;
 
+    // Initialize Quill
+    if (!quill) {
+        quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Write your masterpiece...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link', 'image', 'video'],
+                    ['clean']
+                ]
+            }
+        });
+    }
+
+    // Events
     document.getElementById('logout-btn').addEventListener('click', () => logoutUser());
+    document.getElementById('create-new-btn').addEventListener('click', () => openEditor());
+    document.getElementById('show-list-btn').addEventListener('click', () => showList());
+    document.getElementById('cancel-edit').addEventListener('click', () => showList());
 
-    // Toggle Editor
-    const editor = document.getElementById('editor-container');
-    document.getElementById('new-post-btn').addEventListener('click', () => {
-        editor.style.display = 'block';
+    // GitHub Settings Logic
+    const ghModal = document.getElementById('gh-modal');
+    document.getElementById('gh-settings-btn').addEventListener('click', () => {
+        document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || '';
+        document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
+        ghModal.style.display = 'block';
     });
 
-    document.getElementById('cancel-post').addEventListener('click', () => {
-        editor.style.display = 'none';
-    });
-
-    // Handle Publish
-    document.getElementById('post-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const title = document.getElementById('post-title').value;
-        const category = document.getElementById('post-cat').value;
-        const content = document.getElementById('post-content').value;
-
-        try {
-            await createPost({ title, category, content, excerpt: content.substring(0, 100) + '...' });
-            alert('Post published!');
-            editor.style.display = 'none';
-            e.target.reset();
-        } catch (error) {
-            alert('Error publishing: ' + error.message);
+    document.getElementById('save-gh-btn').addEventListener('click', () => {
+        const repo = document.getElementById('gh-repo').value.trim();
+        const token = document.getElementById('gh-token').value.trim();
+        if (repo && token) {
+            localStorage.setItem('gh_repo', repo);
+            localStorage.setItem('gh_token', token);
+            alert('Settings Saved!');
+            ghModal.style.display = 'none';
+        } else {
+            alert('Please fill both fields');
         }
     });
+
+    document.getElementById('close-gh-btn').addEventListener('click', () => ghModal.style.display = 'none');
+
+    // Upload Logic
+    const mediaInput = document.getElementById('media-input');
+    document.getElementById('upload-media-btn').addEventListener('click', () => mediaInput.click());
+
+    mediaInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const repo = localStorage.getItem('gh_repo');
+        const token = localStorage.getItem('gh_token');
+
+        if (!repo || !token) {
+            alert("Please configure GitHub Settings first!");
+            ghModal.style.display = 'block';
+            return;
+        }
+
+        try {
+            const url = await uploadToGitHub(file, token, repo);
+            const range = quill.getSelection(true) || { index: quill.getLength() };
+            if (file.type.startsWith('video')) {
+                quill.insertEmbed(range.index, 'video', url);
+            } else {
+                quill.insertEmbed(range.index, 'image', url);
+            }
+        } catch (err) {
+            alert("Upload failed: " + err.message);
+        }
+    });
+
+    // Form Submit
+    document.getElementById('post-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            title: document.getElementById('post-title').value,
+            category: document.getElementById('post-cat').value,
+            content: quill.root.innerHTML,
+            excerpt: quill.getText().substring(0, 150) + '...'
+        };
+
+        try {
+            if (currentEditingId) {
+                await updatePost(currentEditingId, data);
+            } else {
+                await createPost(data);
+            }
+            alert('Saved successfully!');
+            showList();
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+
+    refreshList();
+}
+
+async function refreshList() {
+    const table = document.getElementById('admin-posts-table');
+    const posts = await getPosts(true);
+
+    if (posts.length === 0) {
+        table.innerHTML = '<p>No posts yet.</p>';
+        return;
+    }
+
+    table.innerHTML = posts.map(p => `
+        <div class="post-card" style="display:flex; justify-content:space-between; align-items:center; opacity: ${p.published ? 1 : 0.5}">
+            <div>
+                <h4 style="margin:0">${p.title} ${p.published ? '' : '(HIDDEN)'}</h4>
+                <small style="color:var(--text-muted)">${new Date(p.date?.seconds * 1000).toLocaleDateString()}</small>
+            </div>
+            <div style="display:flex; gap:0.5rem">
+                <button class="btn-secondary btn-sm" onclick="window.editPost('${p.id}')">Edit</button>
+                <button class="btn-secondary btn-sm" onclick="window.togglePub('${p.id}', ${!p.published})">
+                    ${p.published ? 'Unpublish' : 'Publish'}
+                </button>
+                <button class="btn-secondary btn-sm" style="background:red" onclick="window.delPost('${p.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.editPost = async (id) => {
+    const posts = await getPosts(true);
+    const post = posts.find(p => p.id === id);
+    if (post) openEditor(post);
+};
+
+window.togglePub = async (id, status) => {
+    if (confirm(`Set visibility to ${status}?`)) {
+        await updatePost(id, { published: status });
+        refreshList();
+    }
+};
+
+window.delPost = async (id) => {
+    if (confirm('Delete permanently?')) {
+        await deletePost(id);
+        refreshList();
+    }
+};
+
+function openEditor(post = null) {
+    document.getElementById('posts-list-view').style.display = 'none';
+    document.getElementById('editor-view').style.display = 'block';
+
+    if (post) {
+        currentEditingId = post.id;
+        document.getElementById('editor-title').textContent = "Edit Article";
+        document.getElementById('post-title').value = post.title;
+        document.getElementById('post-cat').value = post.category || '';
+        quill.root.innerHTML = post.content || '';
+    } else {
+        currentEditingId = null;
+        document.getElementById('editor-title').textContent = "Create Article";
+        document.getElementById('post-title').value = '';
+        document.getElementById('post-cat').value = '';
+        quill.root.innerHTML = '';
+    }
+}
+
+function showList() {
+    document.getElementById('posts-list-view').style.display = 'block';
+    document.getElementById('editor-view').style.display = 'none';
+    refreshList();
 }
