@@ -1,8 +1,7 @@
+@import "tailwindcss";
 @config "../tailwind.config.js";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
+/* Custom Base Styles */
 @layer base {
   body {
     @apply bg-background text-text font-sans antialiased;
