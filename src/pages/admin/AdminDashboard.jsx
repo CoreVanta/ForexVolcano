@@ -1,16 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { db } from '../../firebase/config';
+import { collection, getCountFromServer } from 'firebase/firestore';
 
 const AdminDashboard = () => {
+    const [stats, setStats] = useState({
+        users: 0,
+        courses: 0,
+        analysis: 0,
+        news: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const usersSnap = await getCountFromServer(collection(db, "users"));
+                const coursesSnap = await getCountFromServer(collection(db, "courses"));
+                const analysisSnap = await getCountFromServer(collection(db, "analysis"));
+                const newsSnap = await getCountFromServer(collection(db, "news"));
+
+                setStats({
+                    users: usersSnap.data().count,
+                    courses: coursesSnap.data().count,
+                    analysis: analysisSnap.data().count,
+                    news: newsSnap.data().count
+                });
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
     return (
         <div>
             <h1 className="text-3xl font-bold text-white mb-8">System Overview</h1>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-                <StatCard title="Total Users" value="1,234" change="+12%" color="primary" />
-                <StatCard title="Active Courses" value="8" change="0%" color="white" />
-                <StatCard title="Analysis Posts" value="156" change="+5 this week" color="secondary" />
-                <StatCard title="News Alerts" value="892" change="+24 today" color="accent" />
+                <StatCard title="Total Users" value={loading ? "..." : stats.users} change="Registered" color="primary" />
+                <StatCard title="Active Courses" value={loading ? "..." : stats.courses} change="Live" color="white" />
+                <StatCard title="Analysis Posts" value={loading ? "..." : stats.analysis} change="Market Updates" color="secondary" />
+                <StatCard title="News Alerts" value={loading ? "..." : stats.news} change="Published" color="accent" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -59,13 +93,13 @@ const StatCard = ({ title, value, change, color }) => {
     );
 };
 
-const ActionRow = ({ label }) => (
-    <div className="flex items-center justify-between p-3 bg-background rounded-lg hover:bg-gray-800 cursor-pointer transition-colors">
+const ActionRow = ({ label, to }) => (
+    <Link to={to} className="flex items-center justify-between p-3 bg-background rounded-lg hover:bg-gray-800 cursor-pointer transition-colors">
         <span className="text-gray-300">{label}</span>
         <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-    </div>
+    </Link>
 );
 
 const StatusRow = ({ label, status }) => (

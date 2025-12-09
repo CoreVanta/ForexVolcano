@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -27,6 +27,7 @@ const ManageNews = () => {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
+    const [editId, setEditId] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         impact: 'Medium',
@@ -71,29 +72,56 @@ const ManageNews = () => {
             // Parse currencies
             const currencies = formData.affectedCurrencies.split(',').map(c => c.trim().toUpperCase()).filter(c => c);
 
-            await addDoc(collection(db, 'news'), {
-                title: formData.title,
-                impact: formData.impact,
-                content: formData.content,
-                image: formData.image,
-                affectedCurrencies: currencies,
-                timestamp: serverTimestamp() // Use server timestamp
-            });
+            if (editId) {
+                await updateDoc(doc(db, 'news', editId), {
+                    title: formData.title,
+                    impact: formData.impact,
+                    content: formData.content,
+                    image: formData.image,
+                    affectedCurrencies: currencies,
+                    timestamp: serverTimestamp() // Optional: update timestamp on edit? User might generally prefer original timestamp. Let's keep it fresh for "Latest News".
+                });
+            } else {
+                await addDoc(collection(db, 'news'), {
+                    title: formData.title,
+                    impact: formData.impact,
+                    content: formData.content,
+                    image: formData.image,
+                    affectedCurrencies: currencies,
+                    timestamp: serverTimestamp()
+                });
+            }
 
             setIsAdding(false);
+            setEditId(null);
             setFormData({ title: '', impact: 'Medium', content: '', image: '', affectedCurrencies: '' });
             fetchNews();
         } catch (error) {
-            console.error("Error adding news:", error);
-            alert("Failed to add news item.");
+            console.error("Error saving news:", error);
+            alert("Failed to save news item.");
         }
+    };
+
+    const handleEdit = (item) => {
+        setFormData({
+            title: item.title,
+            impact: item.impact,
+            content: item.content,
+            image: item.image,
+            affectedCurrencies: item.affectedCurrencies ? item.affectedCurrencies.join(', ') : ''
+        });
+        setEditId(item.id);
+        setIsAdding(true);
     };
 
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-white">Manage News</h1>
-                <Button onClick={() => setIsAdding(!isAdding)}>
+                <Button onClick={() => {
+                    setIsAdding(!isAdding);
+                    if (isAdding) { setEditId(null); setFormData({ title: '', impact: 'Medium', content: '', image: '', affectedCurrencies: '' }); }
+                }}>
                     {isAdding ? 'Cancel' : 'Post New Alert'}
                 </Button>
             </div>
@@ -101,7 +129,7 @@ const ManageNews = () => {
             {/* Add News Form */}
             {isAdding && (
                 <div className="bg-surface p-6 rounded-xl border border-gray-800 mb-8 animate-fade-in">
-                    <h2 className="text-xl font-bold text-white mb-4">New Market Update</h2>
+                    <h2 className="text-xl font-bold text-white mb-4">{editId ? 'Edit Market Update' : 'New Market Update'}</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -167,7 +195,7 @@ const ManageNews = () => {
                         </div>
 
                         <div className="flex justify-end pt-4">
-                            <Button type="submit" variant="primary">Publish News</Button>
+                            <Button type="submit" variant="primary">{editId ? 'Update News' : 'Publish News'}</Button>
                         </div>
                     </form>
                 </div>
@@ -212,6 +240,12 @@ const ManageNews = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button
+                                                onClick={() => handleEdit(item)}
+                                                className="text-primary hover:text-primary/80 transition-colors mr-4"
+                                            >
+                                                Edit
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(item.id)}
                                                 className="text-red-400 hover:text-red-300 transition-colors"

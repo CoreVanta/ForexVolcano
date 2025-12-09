@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -27,6 +27,7 @@ const ManageAnalysis = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
+    const [editId, setEditId] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         pair: 'EUR/USD',
@@ -68,25 +69,48 @@ const ManageAnalysis = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await addDoc(collection(db, 'analysis'), {
-                ...formData,
-                timestamp: serverTimestamp()
-            });
+            if (editId) {
+                await updateDoc(doc(db, 'analysis', editId), {
+                    ...formData,
+                    timestamp: serverTimestamp()
+                });
+            } else {
+                await addDoc(collection(db, 'analysis'), {
+                    ...formData,
+                    timestamp: serverTimestamp()
+                });
+            }
 
             setIsAdding(false);
+            setEditId(null);
             setFormData({ title: '', pair: 'EUR/USD', direction: 'Neutral', content: '', image: '' });
             fetchPosts();
         } catch (error) {
-            console.error("Error adding post:", error);
-            alert("Failed to add analysis.");
+            console.error("Error saving post:", error);
+            alert("Failed to save analysis.");
         }
+    };
+
+    const handleEdit = (item) => {
+        setFormData({
+            title: item.title,
+            pair: item.pair,
+            direction: item.direction,
+            content: item.content,
+            image: item.image
+        });
+        setEditId(item.id);
+        setIsAdding(true);
     };
 
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-white">Manage Analysis</h1>
-                <Button onClick={() => setIsAdding(!isAdding)}>
+                <Button onClick={() => {
+                    setIsAdding(!isAdding);
+                    if (isAdding) { setEditId(null); setFormData({ title: '', pair: 'EUR/USD', direction: 'Neutral', content: '', image: '' }); }
+                }}>
                     {isAdding ? 'Cancel' : 'New Analysis'}
                 </Button>
             </div>
@@ -94,7 +118,7 @@ const ManageAnalysis = () => {
             {/* Add Form */}
             {isAdding && (
                 <div className="bg-surface p-6 rounded-xl border border-gray-800 mb-8 animate-fade-in">
-                    <h2 className="text-xl font-bold text-white mb-4">Post Technical Breakdown</h2>
+                    <h2 className="text-xl font-bold text-white mb-4">{editId ? 'Edit Analysis' : 'Post Technical Breakdown'}</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
@@ -159,7 +183,7 @@ const ManageAnalysis = () => {
                         </div>
 
                         <div className="flex justify-end pt-4">
-                            <Button type="submit" variant="primary">Post Analysis</Button>
+                            <Button type="submit" variant="primary">{editId ? 'Update Analysis' : 'Post Analysis'}</Button>
                         </div>
                     </form>
                 </div>
@@ -208,6 +232,12 @@ const ManageAnalysis = () => {
                                             {item.title}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button
+                                                onClick={() => handleEdit(item)}
+                                                className="text-primary hover:text-primary/80 transition-colors mr-4"
+                                            >
+                                                Edit
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(item.id)}
                                                 className="text-red-400 hover:text-red-300 transition-colors"

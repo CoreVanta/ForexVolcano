@@ -28,6 +28,7 @@ const ManageCourses = () => {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAddingCourse, setIsAddingCourse] = useState(false);
+    const [editCourseId, setEditCourseId] = useState(null);
 
     // Course Form State
     const [courseForm, setCourseForm] = useState({ title: '', description: '', image: '', level: 'Beginner' });
@@ -58,18 +59,37 @@ const ManageCourses = () => {
     const handleAddCourse = async (e) => {
         e.preventDefault();
         try {
-            await addDoc(collection(db, 'courses'), {
-                ...courseForm,
-                order: courses.length + 1,
-                createdAt: serverTimestamp()
-            });
+            if (editCourseId) {
+                await updateDoc(doc(db, 'courses', editCourseId), {
+                    ...courseForm,
+                    // Keep existing order and createdAt
+                });
+            } else {
+                await addDoc(collection(db, 'courses'), {
+                    ...courseForm,
+                    order: courses.length + 1,
+                    createdAt: serverTimestamp()
+                });
+            }
             setIsAddingCourse(false);
+            setEditCourseId(null);
             setCourseForm({ title: '', description: '', image: '', level: 'Beginner' });
             fetchCourses();
         } catch (error) {
-            console.error("Error adding course:", error);
-            alert("Failed to add course");
+            console.error("Error saving course:", error);
+            alert("Failed to save course");
         }
+    };
+
+    const handleEditCourse = (course) => {
+        setCourseForm({
+            title: course.title,
+            description: course.description,
+            image: course.image,
+            level: course.level || 'Beginner'
+        });
+        setEditCourseId(course.id);
+        setIsAddingCourse(true);
     };
 
     const handleDeleteCourse = async (id) => {
@@ -98,14 +118,17 @@ const ManageCourses = () => {
         <div>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-white">Manage Courses</h1>
-                <Button onClick={() => setIsAddingCourse(!isAddingCourse)}>
+                <Button onClick={() => {
+                    setIsAddingCourse(!isAddingCourse);
+                    if (isAddingCourse) { setEditCourseId(null); setCourseForm({ title: '', description: '', image: '', level: 'Beginner' }); }
+                }}>
                     {isAddingCourse ? 'Cancel' : 'New Course'}
                 </Button>
             </div>
 
             {isAddingCourse && (
                 <div className="bg-surface p-6 rounded-xl border border-gray-800 mb-8 animate-fade-in">
-                    <h2 className="text-xl font-bold text-white mb-4">Create New Course</h2>
+                    <h2 className="text-xl font-bold text-white mb-4">{editCourseId ? 'Edit Course' : 'Create New Course'}</h2>
                     <form onSubmit={handleAddCourse} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -154,7 +177,7 @@ const ManageCourses = () => {
                             />
                         </div>
                         <div className="flex justify-end">
-                            <Button type="submit" variant="primary">Create Course</Button>
+                            <Button type="submit" variant="primary">{editCourseId ? 'Update Course' : 'Create Course'}</Button>
                         </div>
                     </form>
                 </div>
@@ -166,6 +189,9 @@ const ManageCourses = () => {
                         <div className="h-40 bg-gray-900 relative">
                             {course.image && <img src={course.image} alt={course.title} className="w-full h-full object-cover" />}
                             <div className="absolute top-2 right-2 flex gap-2">
+                                <button onClick={(e) => { e.stopPropagation(); handleEditCourse(course); }} className="bg-primary/80 p-1 rounded text-white hover:bg-primary">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                </button>
                                 <button onClick={(e) => { e.stopPropagation(); handleDeleteCourse(course.id); }} className="bg-red-500/80 p-1 rounded text-white hover:bg-red-600">
                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
@@ -190,6 +216,7 @@ const ManageCourses = () => {
 const ManageLessons = ({ course, onBack }) => {
     const [lessons, setLessons] = useState([]);
     const [isAdding, setIsAdding] = useState(false);
+    const [editLessonId, setEditLessonId] = useState(null);
     const [lessonForm, setLessonForm] = useState({ title: '', videoUrl: '', content: '', duration: '10 min' });
     const [loading, setLoading] = useState(true);
 
@@ -215,18 +242,36 @@ const ManageLessons = ({ course, onBack }) => {
     const handleAddLesson = async (e) => {
         e.preventDefault();
         try {
-            await addDoc(collection(db, 'courses', course.id, 'lessons'), {
-                ...lessonForm,
-                order: lessons.length + 1,
-                createdAt: serverTimestamp()
-            });
+            if (editLessonId) {
+                await updateDoc(doc(db, 'courses', course.id, 'lessons', editLessonId), {
+                    ...lessonForm,
+                });
+            } else {
+                await addDoc(collection(db, 'courses', course.id, 'lessons'), {
+                    ...lessonForm,
+                    order: lessons.length + 1,
+                    createdAt: serverTimestamp()
+                });
+            }
             setIsAdding(false);
+            setEditLessonId(null);
             setLessonForm({ title: '', videoUrl: '', content: '', duration: '10 min' });
             fetchLessons();
         } catch (error) {
-            console.error("Error adding lesson:", error);
-            alert("Failed to add lesson");
+            console.error("Error saving lesson:", error);
+            alert("Failed to save lesson");
         }
+    };
+
+    const handleEditLesson = (lesson) => {
+        setLessonForm({
+            title: lesson.title,
+            videoUrl: lesson.videoUrl,
+            content: lesson.content,
+            duration: lesson.duration
+        });
+        setEditLessonId(lesson.id);
+        setIsAdding(true);
     };
 
     const handleDeleteLesson = async (lessonId) => {
@@ -254,7 +299,10 @@ const ManageLessons = ({ course, onBack }) => {
 
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-white">Lessons ({lessons.length})</h2>
-                <Button onClick={() => setIsAdding(!isAdding)} variant="secondary">
+                <Button onClick={() => {
+                    setIsAdding(!isAdding);
+                    if (isAdding) { setEditLessonId(null); setLessonForm({ title: '', videoUrl: '', content: '', duration: '10 min' }); }
+                }} variant="secondary">
                     {isAdding ? 'Cancel' : 'Add Lesson'}
                 </Button>
             </div>
@@ -308,7 +356,7 @@ const ManageLessons = ({ course, onBack }) => {
                             </div>
                         </div>
                         <div className="flex justify-end">
-                            <Button type="submit" variant="primary">Save Lesson</Button>
+                            <Button type="submit" variant="primary">{editLessonId ? 'Update Lesson' : 'Save Lesson'}</Button>
                         </div>
                     </form>
                 </div>
@@ -327,7 +375,7 @@ const ManageLessons = ({ course, onBack }) => {
                             </div>
                         </div>
                         <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {/* Edit Button Placeholder */}
+                            <button onClick={() => handleEditLesson(lesson)} className="text-primary hover:text-primary/80 text-sm">Edit</button>
                             <button onClick={() => handleDeleteLesson(lesson.id)} className="text-red-400 hover:text-red-300 text-sm">Delete</button>
                         </div>
                     </div>
