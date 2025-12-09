@@ -44,6 +44,14 @@ const News = () => {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Helper to strip HTML tags for preview
+    const stripHtml = (html) => {
+        if (!html) return "";
+        const tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    };
+
     useEffect(() => {
         const fetchNews = async () => {
             try {
@@ -91,7 +99,7 @@ const News = () => {
                                 <Card
                                     title={item.title}
                                     image={item.image}
-                                    content={item.content} // Note: This might show HTML tags if content is rich text. We'll strip tags for preview later.
+                                    content={stripHtml(item.content)}
                                     subtitle={
                                         <div className="flex items-center gap-2">
                                             <span className="text-gray-500 text-xs">
