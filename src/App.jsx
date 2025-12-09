@@ -4,11 +4,11 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Analysis from './pages/Analysis';
+import News from './pages/News';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
 // Placeholder Components
-const News = () => <div className="p-8 text-center text-2xl pt-24">Market News Page</div>;
 const Login = () => <div className="p-8 text-center text-2xl pt-24">Login Page</div>;
 const Register = () => <div className="p-8 text-center text-2xl pt-24">Register Page</div>;
 const Dashboard = () => <div className="p-8 text-center text-2xl pt-24">User Dashboard</div>;
