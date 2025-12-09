@@ -2,6 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
+const modules = {
+    toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+        [{ 'color': [] }, { 'background': [] }],
+        ['link', 'image'],
+        ['clean']
+    ],
+};
+
+const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image', 'color', 'background'
+];
 
 const ManageAnalysis = () => {
     const [posts, setPosts] = useState([]);
@@ -126,14 +146,16 @@ const ManageAnalysis = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Analysis Content</label>
-                            <textarea
-                                required
-                                rows={5}
-                                className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                value={formData.content}
-                                onChange={e => setFormData({ ...formData, content: e.target.value })}
-                                placeholder="Detailed technical analysis..."
-                            />
+                            <div className="bg-white rounded-lg overflow-hidden text-black">
+                                <ReactQuill
+                                    theme="snow"
+                                    value={formData.content}
+                                    onChange={(content) => setFormData({ ...formData, content })}
+                                    modules={modules}
+                                    formats={formats}
+                                    className="h-96 mb-12"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex justify-end pt-4">

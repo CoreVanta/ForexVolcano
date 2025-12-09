@@ -2,6 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
+const modules = {
+    toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+        [{ 'color': [] }, { 'background': [] }],
+        ['link', 'image'],
+        ['clean']
+    ],
+};
+
+const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image', 'color', 'background'
+];
 
 const ManageCourses = () => {
     const [courses, setCourses] = useState([]);
@@ -113,12 +133,16 @@ const ManageCourses = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
-                            <textarea
-                                required
-                                className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                value={courseForm.description}
-                                onChange={e => setCourseForm({ ...courseForm, description: e.target.value })}
-                            />
+                            <div className="bg-white rounded-lg overflow-hidden text-black">
+                                <ReactQuill
+                                    theme="snow"
+                                    value={courseForm.description}
+                                    onChange={(content) => setCourseForm({ ...courseForm, description: content })}
+                                    modules={modules}
+                                    formats={formats}
+                                    className="h-48 mb-12"
+                                />
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Cover Image URL</label>
@@ -272,12 +296,16 @@ const ManageLessons = ({ course, onBack }) => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Lesson Content / Notes</label>
-                            <textarea
-                                rows={4}
-                                className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                value={lessonForm.content}
-                                onChange={e => setLessonForm({ ...lessonForm, content: e.target.value })}
-                            />
+                            <div className="bg-white rounded-lg overflow-hidden text-black">
+                                <ReactQuill
+                                    theme="snow"
+                                    value={lessonForm.content}
+                                    onChange={(content) => setLessonForm({ ...lessonForm, content })}
+                                    modules={modules}
+                                    formats={formats}
+                                    className="h-72 mb-12"
+                                />
+                            </div>
                         </div>
                         <div className="flex justify-end">
                             <Button type="submit" variant="primary">Save Lesson</Button>
