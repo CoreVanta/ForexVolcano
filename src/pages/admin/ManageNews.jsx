@@ -3,7 +3,26 @@ import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
 import ReactQuill from 'react-quill-new';
+import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+
+const modules = {
+    toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+        [{ 'color': [] }, { 'background': [] }],
+        ['link', 'image'],
+        ['clean']
+    ],
+};
+
+const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image', 'color', 'background'
+];
 
 const ManageNews = () => {
     const [news, setNews] = useState([]);
@@ -118,7 +137,9 @@ const ManageNews = () => {
                                     theme="snow"
                                     value={formData.content}
                                     onChange={(content) => setFormData({ ...formData, content })}
-                                    className="h-64 mb-12" // mb-12 to make space for toolbar/dropdowns
+                                    modules={modules}
+                                    formats={formats}
+                                    className="h-96 mb-12" // Increased height
                                 />
                             </div>
                         </div>

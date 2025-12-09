@@ -47,9 +47,14 @@ const News = () => {
     // Helper to strip HTML tags for preview
     const stripHtml = (html) => {
         if (!html) return "";
+        // Replace block-level tags with spaces to prevent words from sticking together
+        const htmlWithSpaces = html.replace(/<\/p>/gi, ' ')
+            .replace(/<\/div>/gi, ' ')
+            .replace(/<br\s*\/?>/gi, ' ');
+
         const tmp = document.createElement("DIV");
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || "";
+        tmp.innerHTML = htmlWithSpaces;
+        return (tmp.textContent || tmp.innerText || "").trim();
     };
 
     useEffect(() => {
