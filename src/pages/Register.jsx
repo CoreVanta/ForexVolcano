@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import Button from '../components/ui/Button';
@@ -46,6 +46,28 @@ const Register = () => {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleGoogleRegister = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                username: user.displayName,
+                email: user.email,
+                role: 'user',
+                createdAt: new Date().toISOString(),
+                avatar_url: user.photoURL
+            }, { merge: true });
+
+            navigate('/dashboard');
+        } catch (err) {
+            console.error(err);
+            setError('Failed to sign up with Google');
         }
     };
 
@@ -138,6 +160,36 @@ const Register = () => {
                             </Button>
                         </div>
                     </form>
+                </div>
+
+                <div className="mt-6">
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-700" />
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-surface text-gray-400">
+                                Or continue with
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 grid grid-cols-1 gap-3">
+                        <div>
+                            <button
+                                type="button"
+                                onClick={handleGoogleRegister}
+                                className="w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                            >
+                                <span className="sr-only">Sign up with Google</span>
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path
+                                        d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 0.507 5.387 0 12s5.36 12 12 12c3.627 0 6.627-1.2 8.52-3.387 1.947-2.207 2.48-5.747 2.48-6.173 0-.613-.053-1.12-.133-1.507H12.48z"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
