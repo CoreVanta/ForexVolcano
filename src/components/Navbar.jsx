@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 const Navbar = () => {
     const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
+            if (currentUser) {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                    if (userDoc.exists() && userDoc.data().role === 'admin') {
+                        setIsAdmin(true);
+                    } else {
+                        setIsAdmin(false);
+                    }
+                } catch (error) {
+                    console.error("Error checking admin role:", error);
+                    setIsAdmin(false);
+                }
+            } else {
+                setIsAdmin(false);
+            }
         });
         return () => unsubscribe();
     }, []);
@@ -43,8 +60,9 @@ const Navbar = () => {
                             {user ? (
                                 <div className="flex items-center space-x-4">
                                     <Link to="/dashboard" className="text-primary hover:text-green-400 font-medium px-3 py-2">Dashboard</Link>
-                                    {/* Note: Admin link should heavily be protected by role check, showing mainly for demo/structure */}
-                                    {/* <Link to="/admin" className="text-accent hover:text-orange-400 font-medium px-3 py-2">Admin</Link> */}
+                                    {isAdmin && (
+                                        <Link to="/admin" className="text-accent hover:text-orange-400 font-medium px-3 py-2">Admin Panel</Link>
+                                    )}
                                     <button
                                         onClick={handleLogout}
                                         className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-md text-sm font-medium"
