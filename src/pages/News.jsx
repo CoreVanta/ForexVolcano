@@ -93,7 +93,12 @@ const News = () => {
                                 content={item.content}
                                 subtitle={
                                     <div className="flex items-center gap-2">
-                                        <span className="text-gray-500 text-xs">{item.timestamp || new Date().toLocaleDateString()}</span>
+                                        <span className="text-gray-500 text-xs">
+                                            {item.timestamp?.seconds
+                                                ? new Date(item.timestamp.seconds * 1000).toLocaleDateString()
+                                                : (item.timestamp || new Date().toLocaleDateString())
+                                            }
+                                        </span>
                                     </div>
                                 }
                                 badges={[
