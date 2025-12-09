@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import Button from '../components/ui/Button';
 
@@ -24,6 +24,17 @@ const Login = () => {
             setError('Failed to login. Please check your credentials.');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+            navigate('/dashboard');
+        } catch (err) {
+            console.error(err);
+            setError('Failed to sign in with Google');
         }
     };
 
@@ -112,9 +123,10 @@ const Login = () => {
 
                         <div className="mt-6 grid grid-cols-1 gap-3">
                             <div>
-                                <a
-                                    href="#"
-                                    className="w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700"
+                                <button
+                                    type="button"
+                                    onClick={handleGoogleLogin}
+                                    className="w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                 >
                                     <span className="sr-only">Sign in with Google</span>
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -122,7 +134,7 @@ const Login = () => {
                                             d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 0.507 5.387 0 12s5.36 12 12 12c3.627 0 6.627-1.2 8.52-3.387 1.947-2.207 2.48-5.747 2.48-6.173 0-.613-.053-1.12-.133-1.507H12.48z"
                                         />
                                     </svg>
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
