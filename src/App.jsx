@@ -5,14 +5,18 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Analysis from './pages/Analysis';
 import News from './pages/News';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/dashboard/Dashboard';
+import AdminLayout from './layouts/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ManageNews from './pages/admin/ManageNews';
+import ManageAnalysis from './pages/admin/ManageAnalysis';
+import ManageCourses from './pages/admin/ManageCourses';
+import CourseView from './pages/dashboard/CourseView';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
-// Placeholder Components
-const Login = () => <div className="p-8 text-center text-2xl pt-24">Login Page</div>;
-const Register = () => <div className="p-8 text-center text-2xl pt-24">Register Page</div>;
-const Dashboard = () => <div className="p-8 text-center text-2xl pt-24">User Dashboard</div>;
-const AdminDashboard = () => <div className="p-8 text-center text-2xl pt-24">Admin API & Content Management</div>;
 
 // Protected Route HOC
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -50,17 +54,24 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            <Route path="/dashboard/*" element={
+            <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
             } />
-
-            <Route path="/admin/*" element={
-              <ProtectedRoute adminOnly={true}>
-                <AdminDashboard />
+            <Route path="/dashboard/course/:courseId" element={
+              <ProtectedRoute>
+                <CourseView />
               </ProtectedRoute>
             } />
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="news" element={<ManageNews />} />
+              <Route path="analysis" element={<ManageAnalysis />} />
+              <Route path="courses" element={<ManageCourses />} />
+            </Route>
           </Routes>
         </main>
         <Footer />
