@@ -3,7 +3,6 @@ import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
 import ReactQuill from 'react-quill-new';
-import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
 const modules = {
