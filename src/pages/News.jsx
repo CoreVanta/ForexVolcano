@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import { db } from '../firebase/config';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
@@ -86,29 +87,30 @@ const News = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {news.map(item => (
-                            <Card
-                                key={item.id}
-                                title={item.title}
-                                image={item.image}
-                                content={item.content}
-                                subtitle={
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-gray-500 text-xs">
-                                            {item.timestamp?.seconds
-                                                ? new Date(item.timestamp.seconds * 1000).toLocaleDateString()
-                                                : (item.timestamp || new Date().toLocaleDateString())
-                                            }
-                                        </span>
-                                    </div>
-                                }
-                                badges={[
-                                    { text: item.impact, color: IMPACT_COLORS[item.impact] || 'bg-gray-800 text-white' },
-                                    ...(item.affectedCurrencies || []).map(curr => ({
-                                        text: curr,
-                                        color: 'bg-surface border border-gray-700 text-white'
-                                    }))
-                                ]}
-                            />
+                            <Link key={item.id} to={`/news/${item.id}`} className="block group">
+                                <Card
+                                    title={item.title}
+                                    image={item.image}
+                                    content={item.content} // Note: This might show HTML tags if content is rich text. We'll strip tags for preview later.
+                                    subtitle={
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-gray-500 text-xs">
+                                                {item.timestamp?.seconds
+                                                    ? new Date(item.timestamp.seconds * 1000).toLocaleDateString()
+                                                    : (item.timestamp || new Date().toLocaleDateString())
+                                                }
+                                            </span>
+                                        </div>
+                                    }
+                                    badges={[
+                                        { text: item.impact, color: IMPACT_COLORS[item.impact] || 'bg-gray-800 text-white' },
+                                        ...(item.affectedCurrencies || []).map(curr => ({
+                                            text: curr,
+                                            color: 'bg-surface border border-gray-700 text-white'
+                                        }))
+                                    ]}
+                                />
+                            </Link>
                         ))}
                     </div>
                 )}

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const ManageNews = () => {
     const [news, setNews] = useState([]);
@@ -111,14 +113,14 @@ const ManageNews = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Content/Summary</label>
-                            <textarea
-                                required
-                                rows={3}
-                                className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                value={formData.content}
-                                onChange={e => setFormData({ ...formData, content: e.target.value })}
-                                placeholder="Brief summary of the news event..."
-                            />
+                            <div className="bg-white rounded-lg overflow-hidden text-black">
+                                <ReactQuill
+                                    theme="snow"
+                                    value={formData.content}
+                                    onChange={(content) => setFormData({ ...formData, content })}
+                                    className="h-64 mb-12" // mb-12 to make space for toolbar/dropdowns
+                                />
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

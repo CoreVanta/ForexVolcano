@@ -96,8 +96,8 @@ const Analysis = () => {
                             key={pair}
                             onClick={() => setFilter(pair)}
                             className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${filter === pair
-                                    ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                                    : 'bg-surface text-gray-400 hover:bg-gray-800 hover:text-white'
+                                ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                                : 'bg-surface text-gray-400 hover:bg-gray-800 hover:text-white'
                                 }`}
                         >
                             {pair}
@@ -120,7 +120,12 @@ const Analysis = () => {
                                     content={post.content}
                                     subtitle={
                                         <div className="flex items-center gap-3">
-                                            <span className="text-gray-500 text-xs">{post.timestamp || new Date().toLocaleDateString()}</span>
+                                            <span className="text-gray-500 text-xs">
+                                                {post.timestamp?.seconds
+                                                    ? new Date(post.timestamp.seconds * 1000).toLocaleDateString()
+                                                    : (post.timestamp || new Date().toLocaleDateString())
+                                                }
+                                            </span>
                                             <span className="text-gray-600">•</span>
                                             <span className="text-gray-500 text-xs text-accent">By {post.author || 'Admin'}</span>
                                         </div>
