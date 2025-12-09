@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
 import Button from '../components/ui/Button';
 
 const Login = () => {
@@ -11,14 +12,28 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    const redirectBasedOnRole = async (uid) => {
+        try {
+            const userDoc = await getDoc(doc(db, 'users', uid));
+            if (userDoc.exists() && userDoc.data().role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error("Error checking role:", error);
+            navigate('/dashboard'); // Default to dashboard on error
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            navigate('/dashboard');
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            await redirectBasedOnRole(userCredential.user.uid);
         } catch (err) {
             console.error(err);
             setError('Failed to login. Please check your credentials.');
@@ -30,8 +45,8 @@ const Login = () => {
     const handleGoogleLogin = async () => {
         try {
             const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
-            navigate('/dashboard');
+            const result = await signInWithPopup(auth, provider);
+            await redirectBasedOnRole(result.user.uid);
         } catch (err) {
             console.error(err);
             setError('Failed to sign in with Google');
