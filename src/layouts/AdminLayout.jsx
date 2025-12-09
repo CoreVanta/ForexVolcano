@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import Button from '../components/ui/Button';
 
@@ -10,31 +11,26 @@ const AdminLayout = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const checkAdminStatus = async () => {
-            if (!auth.currentUser) {
-                navigate('/login');
-                return;
-            }
-
-            try {
-                const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
-                if (userDoc.exists() && userDoc.data().role === 'admin') {
-                    setIsAdmin(true);
-                } else {
-                    // If not admin, kick them out
-                    // For dev purposes, uncomment the line below to BYPASS admin check if needed
-                    // setIsAdmin(true); 
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists() && userDoc.data().role === 'admin') {
+                        setIsAdmin(true);
+                    } else {
+                        navigate('/dashboard');
+                    }
+                } catch (error) {
+                    console.error("Admin check failed", error);
                     navigate('/dashboard');
                 }
-            } catch (error) {
-                console.error("Admin check failed", error);
-                navigate('/dashboard');
-            } finally {
-                setLoading(false);
+            } else {
+                navigate('/login');
             }
-        };
+            setLoading(false);
+        });
 
-        checkAdminStatus();
+        return () => unsubscribe();
     }, [navigate]);
 
     if (loading) {
