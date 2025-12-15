@@ -6,12 +6,19 @@ import Button from '../../components/ui/Button';
 
 // --- Sub-Component: Settings Tab ---
 const DashboardSettings = ({ userProfile, setUserProfile }) => {
+    // Initialize state, but also sync with useEffect when userProfile loads
     const [preferences, setPreferences] = useState(userProfile?.preferences || {
         newsImpacts: ['High', 'Medium', 'Low'],
         analysisCurrencies: ['XAUUSD', 'EURUSD', 'GBPUSD', 'BTCUSD', 'US30'],
         analysisTypes: ['Technical', 'Fundamental']
     });
     const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        if (userProfile?.preferences) {
+            setPreferences(userProfile.preferences);
+        }
+    }, [userProfile]);
 
     const handleSave = async () => {
         setSaving(true);
@@ -90,13 +97,19 @@ const DashboardSettings = ({ userProfile, setUserProfile }) => {
 };
 
 // --- Sub-Component: Profile Tab ---
-// --- Sub-Component: Profile Tab ---
-
 const DashboardProfile = ({ userProfile, setUserProfile }) => {
     const [username, setUsername] = useState(userProfile?.username || '');
     const [bio, setBio] = useState(userProfile?.bio || '');
     const [uploading, setUploading] = useState(false);
     const [saving, setSaving] = useState(false);
+
+    // Sync state when profile loads
+    useEffect(() => {
+        if (userProfile) {
+            setUsername(userProfile.username || '');
+            setBio(userProfile.bio || '');
+        }
+    }, [userProfile]);
 
     // Helper: Compress Image to Base64
     const compressImage = (file) => {
@@ -177,6 +190,13 @@ const DashboardProfile = ({ userProfile, setUserProfile }) => {
         try {
             // Check username uniqueness if changed
             if (username !== userProfile?.username) {
+                // If username is empty
+                if (!username.trim()) {
+                    alert("Username cannot be empty");
+                    setSaving(false);
+                    return;
+                }
+
                 const q = query(collection(db, 'users'), where('username', '==', username));
                 const snap = await getDocs(q);
                 if (!snap.empty) {
@@ -271,6 +291,8 @@ const DashboardProfile = ({ userProfile, setUserProfile }) => {
     );
 };
 
+// --- Main Dashboard Component ---
+
 const Dashboard = () => {
     const [userProfile, setUserProfile] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -345,6 +367,8 @@ const Dashboard = () => {
     }, []);
 
     const displayName = userProfile?.username || auth.currentUser?.displayName || 'Trader';
+
+    console.log("Dashboard Render", { loading, userProfile, activeTab });
 
     return (
         <div className="min-h-screen bg-background text-white animate-fade-in">
