@@ -138,7 +138,7 @@ const Analysis = () => {
                                                     }
                                                 </span>
                                                 <span className="text-gray-600">•</span>
-                                                <span className="text-gray-500 text-xs text-accent">By {post.author || 'Admin'}</span>
+                                                <span className="text-gray-500 text-xs text-accent">By {post.analystName || post.author || 'Admin'}</span>
                                             </div>
                                         }
                                         badges={[

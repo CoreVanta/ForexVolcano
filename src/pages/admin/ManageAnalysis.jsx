@@ -33,7 +33,11 @@ const ManageAnalysis = () => {
         pair: 'EUR/USD',
         direction: 'Neutral',
         content: '',
-        image: ''
+        image: '',
+        analysisType: 'Technical Analysis',
+        analystName: '',
+        analystImage: '',
+        analystBio: ''
     });
 
     useEffect(() => {
@@ -83,7 +87,18 @@ const ManageAnalysis = () => {
 
             setIsAdding(false);
             setEditId(null);
-            setFormData({ title: '', pair: 'EUR/USD', direction: 'Neutral', content: '', image: '' });
+            setEditId(null);
+            setFormData({
+                title: '',
+                pair: 'EUR/USD',
+                direction: 'Neutral',
+                content: '',
+                image: '',
+                analysisType: 'Technical Analysis',
+                analystName: '',
+                analystImage: '',
+                analystBio: ''
+            });
             fetchPosts();
         } catch (error) {
             console.error("Error saving post:", error);
@@ -97,7 +112,13 @@ const ManageAnalysis = () => {
             pair: item.pair,
             direction: item.direction,
             content: item.content,
-            image: item.image
+            direction: item.direction,
+            content: item.content,
+            image: item.image,
+            analysisType: item.analysisType || 'Technical Analysis',
+            analystName: item.analystName || '',
+            analystImage: item.analystImage || '',
+            analystBio: item.analystBio || ''
         });
         setEditId(item.id);
         setIsAdding(true);
@@ -109,7 +130,20 @@ const ManageAnalysis = () => {
                 <h1 className="text-3xl font-bold text-white">Manage Analysis</h1>
                 <Button onClick={() => {
                     setIsAdding(!isAdding);
-                    if (isAdding) { setEditId(null); setFormData({ title: '', pair: 'EUR/USD', direction: 'Neutral', content: '', image: '' }); }
+                    if (isAdding) {
+                        setEditId(null);
+                        setFormData({
+                            title: '',
+                            pair: 'EUR/USD',
+                            direction: 'Neutral',
+                            content: '',
+                            image: '',
+                            analysisType: 'Technical Analysis',
+                            analystName: '',
+                            analystImage: '',
+                            analystBio: ''
+                        });
+                    }
                 }}>
                     {isAdding ? 'Cancel' : 'New Analysis'}
                 </Button>
@@ -144,6 +178,56 @@ const ManageAnalysis = () => {
                                     <option value="Bearish">Bearish (Red)</option>
                                 </select>
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Analysis Type</label>
+                                <select
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                                    value={formData.analysisType}
+                                    onChange={e => setFormData({ ...formData, analysisType: e.target.value })}
+                                >
+                                    <option value="Technical Analysis">Technical Analysis</option>
+                                    <option value="Fundamental Analysis">Fundamental Analysis</option>
+                                    <option value="Sentiment Analysis">Sentiment Analysis</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-gray-800 pt-4 mt-4">
+                            <div className="md:col-span-3">
+                                <h3 className="text-white font-semibold mb-2">Analyst Details</h3>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Analyst Name</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                                    value={formData.analystName}
+                                    onChange={e => setFormData({ ...formData, analystName: e.target.value })}
+                                    placeholder="e.g. John Doe"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Analyst Image (URL)</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                                    value={formData.analystImage}
+                                    onChange={e => setFormData({ ...formData, analystImage: e.target.value })}
+                                    placeholder="https://..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Analyst Bio</label>
+                                <textarea
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none h-[42px] min-h-[42px] resize-none overflow-hidden hover:overflow-y-auto focus:h-24 transition-all"
+                                    value={formData.analystBio}
+                                    onChange={e => setFormData({ ...formData, analystBio: e.target.value })}
+                                    placeholder="Short bio..."
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Image URL (Chart)</label>
                                 <input

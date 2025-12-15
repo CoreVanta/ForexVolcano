@@ -68,7 +68,9 @@ const AnalysisDetail = () => {
                         <div className="flex flex-wrap items-center gap-4 mb-6">
                             <span className="text-gray-400 text-sm">{formattedDate}</span>
                             <span className="text-gray-600">•</span>
-                            <span className="text-accent text-sm">By {post.author || 'Admin'}</span>
+                            <span className="text-accent text-sm uppercase tracking-wider font-bold">
+                                {post.analysisType || 'Technical Analysis'}
+                            </span>
                         </div>
 
                         <div className="flex gap-3 mb-6">
@@ -85,9 +87,31 @@ const AnalysisDetail = () => {
                         </h1>
 
                         <div
-                            className="prose prose-invert prose-lg max-w-none text-gray-300"
+                            className="prose prose-invert prose-lg max-w-none text-gray-300 mb-16"
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
+
+                        {/* Meet Your Analyst Section */}
+                        {(post.analystName || post.analystBio) && (
+                            <div className="border-t border-gray-800 pt-12 mt-12 mb-8">
+                                <h3 className="text-2xl font-bold text-white mb-8">Meet Your Analyst</h3>
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 bg-black/20 p-8 rounded-2xl border border-gray-800/50">
+                                    <div className="w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-full overflow-hidden ring-4 ring-primary/20">
+                                        <img
+                                            src={post.analystImage || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&auto=format&fit=crop&q=60'}
+                                            alt={post.analystName || 'Analyst'}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                    <div className="text-center sm:text-left">
+                                        <h4 className="text-xl font-bold text-white mb-2">{post.analystName || 'Volcano Analyst'}</h4>
+                                        <p className="text-gray-400 leading-relaxed">
+                                            {post.analystBio || 'Professional market analyst at Forex Volcano.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </article>
             </div>
