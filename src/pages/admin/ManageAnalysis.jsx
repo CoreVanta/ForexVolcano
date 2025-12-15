@@ -34,30 +34,17 @@ const ManageAnalysis = () => {
         direction: 'Neutral',
         content: '',
         image: '',
-        analysisType: 'Technical Analysis',
-        analystName: '',
-        analystImage: '',
-        analystBio: '',
-        twitter: '',
-        linkedin: '',
-        telegram: ''
+        analysisType: 'Technical Analysis'
     });
+
+    const [profileData, setProfileData] = useState({});
 
     const fetchProfile = async () => {
         try {
             const docRef = doc(db, 'settings', 'profile');
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                const data = docSnap.data();
-                setFormData(prev => ({
-                    ...prev,
-                    analystName: data.analystName || '',
-                    analystImage: data.analystImage || '',
-                    analystBio: data.analystBio || '',
-                    twitter: data.twitter || '',
-                    linkedin: data.linkedin || '',
-                    telegram: data.telegram || ''
-                }));
+                setProfileData(docSnap.data());
             }
         } catch (error) {
             console.error("Error fetching profile:", error);
@@ -66,6 +53,7 @@ const ManageAnalysis = () => {
 
     useEffect(() => {
         fetchPosts();
+        fetchProfile();
     }, []);
 
     const fetchPosts = async () => {
@@ -96,21 +84,22 @@ const ManageAnalysis = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Merge form data with global profile data
+        const submissionData = {
+            ...formData,
+            ...profileData, // Inject global analyst profile
+            timestamp: serverTimestamp()
+        };
+
         try {
             if (editId) {
-                await updateDoc(doc(db, 'analysis', editId), {
-                    ...formData,
-                    timestamp: serverTimestamp()
-                });
+                await updateDoc(doc(db, 'analysis', editId), submissionData);
             } else {
-                await addDoc(collection(db, 'analysis'), {
-                    ...formData,
-                    timestamp: serverTimestamp()
-                });
+                await addDoc(collection(db, 'analysis'), submissionData);
             }
 
             setIsAdding(false);
-            setEditId(null);
             setEditId(null);
             setFormData({
                 title: '',
@@ -118,13 +107,7 @@ const ManageAnalysis = () => {
                 direction: 'Neutral',
                 content: '',
                 image: '',
-                analysisType: 'Technical Analysis',
-                analystName: '',
-                analystImage: '',
-                analystBio: '',
-                twitter: '',
-                linkedin: '',
-                telegram: ''
+                analysisType: 'Technical Analysis'
             });
             fetchPosts();
         } catch (error) {
@@ -139,16 +122,8 @@ const ManageAnalysis = () => {
             pair: item.pair,
             direction: item.direction,
             content: item.content,
-            direction: item.direction,
-            content: item.content,
             image: item.image,
-            analysisType: item.analysisType || 'Technical Analysis',
-            analystName: item.analystName || '',
-            analystImage: item.analystImage || '',
-            analystBio: item.analystBio || '',
-            twitter: item.twitter || '',
-            linkedin: item.linkedin || '',
-            telegram: item.telegram || ''
+            analysisType: item.analysisType || 'Technical Analysis'
         });
         setEditId(item.id);
         setIsAdding(true);
@@ -168,15 +143,8 @@ const ManageAnalysis = () => {
                             direction: 'Neutral',
                             content: '',
                             image: '',
-                            analysisType: 'Technical Analysis',
-                            analystName: '',
-                            analystImage: '',
-                            analystBio: '',
-                            twitter: '',
-                            linkedin: '',
-                            telegram: ''
+                            analysisType: 'Technical Analysis'
                         });
-                        fetchProfile();
                     }
                 }}>
                     {isAdding ? 'Cancel' : 'New Analysis'}
