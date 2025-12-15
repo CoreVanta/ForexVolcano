@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Analysis from './pages/Analysis';
+import AnalysisDetail from './pages/AnalysisDetail';
 import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Login from './pages/Login';
@@ -51,6 +52,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/analysis" element={<Analysis />} />
+            <Route path="/analysis/:id" element={<AnalysisDetail />} />
             <Route path="/news" element={<News />} />
             <Route path="/news/:id" element={<NewsDetail />} />
             <Route path="/login" element={<Login />} />

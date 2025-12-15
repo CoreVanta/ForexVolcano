@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { db } from '../firebase/config';
@@ -123,36 +124,37 @@ const Analysis = () => {
                             const directionColor = post.direction === 'Bullish' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary';
 
                             return (
-                                <Card
-                                    key={post.id}
-                                    title={post.title}
-                                    image={post.image || post.chart_image_url}
-                                    content={stripHtml(post.content)}
-                                    subtitle={
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-gray-500 text-xs">
-                                                {post.timestamp?.seconds
-                                                    ? new Date(post.timestamp.seconds * 1000).toLocaleDateString()
-                                                    : (post.timestamp || new Date().toLocaleDateString())
-                                                }
-                                            </span>
-                                            <span className="text-gray-600">•</span>
-                                            <span className="text-gray-500 text-xs text-accent">By {post.author || 'Admin'}</span>
-                                        </div>
-                                    }
-                                    badges={[
-                                        { text: post.pair, color: 'bg-surface border border-gray-700 text-white' },
-                                        { text: post.direction, color: directionColor }
-                                    ]}
-                                    footer={
-                                        <Button variant="ghost" size="sm" className="w-full justify-between group-hover:text-white">
-                                            Read Full Breakdown
-                                            <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                            </svg>
-                                        </Button>
-                                    }
-                                />
+                                <Link key={post.id} to={`/analysis/${post.id}`} className="block group">
+                                    <Card
+                                        title={post.title}
+                                        image={post.image || post.chart_image_url}
+                                        content={stripHtml(post.content)}
+                                        subtitle={
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-gray-500 text-xs">
+                                                    {post.timestamp?.seconds
+                                                        ? new Date(post.timestamp.seconds * 1000).toLocaleDateString()
+                                                        : (post.timestamp || new Date().toLocaleDateString())
+                                                    }
+                                                </span>
+                                                <span className="text-gray-600">•</span>
+                                                <span className="text-gray-500 text-xs text-accent">By {post.author || 'Admin'}</span>
+                                            </div>
+                                        }
+                                        badges={[
+                                            { text: post.pair, color: 'bg-surface border border-gray-700 text-white' },
+                                            { text: post.direction, color: directionColor }
+                                        ]}
+                                        footer={
+                                            <Button variant="ghost" size="sm" className="w-full justify-between group-hover:text-white">
+                                                Read Full Breakdown
+                                                <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                </svg>
+                                            </Button>
+                                        }
+                                    />
+                                </Link>
                             );
                         })}
                     </div>
