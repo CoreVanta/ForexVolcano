@@ -60,6 +60,7 @@ const Navbar = () => {
                         <div className="ml-4 flex items-center md:ml-6">
                             {user ? (
                                 <div className="flex items-center space-x-4">
+                                    <Link to="/community" className="text-secondary hover:text-green-400 font-medium px-3 py-2">Community</Link>
                                     <Link to="/dashboard" className="text-primary hover:text-green-400 font-medium px-3 py-2">Dashboard</Link>
                                     {isAdmin && (
                                         <Link to="/admin" className="text-accent hover:text-orange-400 font-medium px-3 py-2">Admin Panel</Link>

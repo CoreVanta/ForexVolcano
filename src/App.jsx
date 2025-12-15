@@ -20,6 +20,7 @@ import CourseView from './pages/dashboard/CourseView';
 import Academy from './pages/Academy';
 import AcademyPath from './pages/AcademyPath';
 import AcademyCourse from './pages/AcademyCourse';
+import Social from './pages/Social';
 import UserProfile from './pages/UserProfile';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -62,6 +63,13 @@ function App() {
             <Route path="/news/:id" element={<NewsDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+
+            {/* Social Network */}
+            <Route path="/community" element={
+              <ProtectedRoute>
+                <Social />
+              </ProtectedRoute>
+            } />
 
             <Route path="/academy" element={<Academy />} />
             <Route path="/academy/:path" element={<AcademyPath />} />
