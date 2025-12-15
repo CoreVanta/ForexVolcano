@@ -144,6 +144,29 @@ const AcademyCourse = () => {
                             <div className="prose prose-invert max-w-none">
                                 <div dangerouslySetInnerHTML={{ __html: activeLesson.content }} />
                             </div>
+
+                            {(course.instructorName || course.instructorBio) && (
+                                <div className="mt-12 border-t border-gray-800 pt-8">
+                                    <h3 className="text-xl font-bold text-white mb-6">Meet Your Instructor</h3>
+                                    <div className="flex items-start gap-6 bg-surface p-6 rounded-xl border border-gray-800">
+                                        {course.instructorImage ? (
+                                            <img
+                                                src={course.instructorImage}
+                                                alt={course.instructorName}
+                                                className="w-20 h-20 rounded-full object-cover border-2 border-primary"
+                                            />
+                                        ) : (
+                                            <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold text-gray-400">
+                                                {course.instructorName ? course.instructorName.charAt(0) : 'I'}
+                                            </div>
+                                        )}
+                                        <div>
+                                            <h4 className="text-lg font-bold text-white">{course.instructorName}</h4>
+                                            <p className="text-gray-400 text-sm whitespace-pre-wrap mt-2">{course.instructorBio}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ) : (
