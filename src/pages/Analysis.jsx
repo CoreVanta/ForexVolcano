@@ -77,6 +77,16 @@ const Analysis = () => {
     // Get unique pairs for filter
     const pairs = ['All', ...new Set(posts.map(p => p.pair))];
 
+    const stripHtml = (html) => {
+        if (!html) return "";
+        const htmlWithSpaces = html.replace(/<\/p>/gi, ' ')
+            .replace(/<\/div>/gi, ' ')
+            .replace(/<br\s*\/?>/gi, ' ');
+        const tmp = document.createElement("DIV");
+        tmp.innerHTML = htmlWithSpaces;
+        return (tmp.textContent || tmp.innerText || "").trim();
+    };
+
     return (
         <div className="bg-background min-h-screen py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,7 +127,7 @@ const Analysis = () => {
                                     key={post.id}
                                     title={post.title}
                                     image={post.image || post.chart_image_url}
-                                    content={post.content}
+                                    content={stripHtml(post.content)}
                                     subtitle={
                                         <div className="flex items-center gap-3">
                                             <span className="text-gray-500 text-xs">
