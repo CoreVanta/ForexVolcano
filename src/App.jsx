@@ -15,6 +15,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageNews from './pages/admin/ManageNews';
 import ManageAnalysis from './pages/admin/ManageAnalysis';
 import ManageCourses from './pages/admin/ManageCourses';
+import AdminProfile from './pages/admin/AdminProfile';
 import CourseView from './pages/dashboard/CourseView';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -75,6 +76,7 @@ function App() {
               <Route path="news" element={<ManageNews />} />
               <Route path="analysis" element={<ManageAnalysis />} />
               <Route path="courses" element={<ManageCourses />} />
+              <Route path="profile" element={<AdminProfile />} />
             </Route>
           </Routes>
         </main>

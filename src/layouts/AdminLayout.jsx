@@ -61,6 +61,7 @@ const AdminLayout = () => {
                     <NavItem to="/admin/news">Manage News</NavItem>
                     <NavItem to="/admin/analysis">Manage Analysis</NavItem>
                     <NavItem to="/admin/courses">Manage Courses</NavItem>
+                    <NavItem to="/admin/profile">Analyst Profile</NavItem>
                 </nav>
 
                 <div className="p-4 border-t border-gray-800">

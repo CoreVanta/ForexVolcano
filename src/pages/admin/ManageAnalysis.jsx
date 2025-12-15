@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, getDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -37,8 +37,32 @@ const ManageAnalysis = () => {
         analysisType: 'Technical Analysis',
         analystName: '',
         analystImage: '',
-        analystBio: ''
+        analystBio: '',
+        twitter: '',
+        linkedin: '',
+        telegram: ''
     });
+
+    const fetchProfile = async () => {
+        try {
+            const docRef = doc(db, 'settings', 'profile');
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                setFormData(prev => ({
+                    ...prev,
+                    analystName: data.analystName || '',
+                    analystImage: data.analystImage || '',
+                    analystBio: data.analystBio || '',
+                    twitter: data.twitter || '',
+                    linkedin: data.linkedin || '',
+                    telegram: data.telegram || ''
+                }));
+            }
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+        }
+    };
 
     useEffect(() => {
         fetchPosts();
@@ -97,7 +121,10 @@ const ManageAnalysis = () => {
                 analysisType: 'Technical Analysis',
                 analystName: '',
                 analystImage: '',
-                analystBio: ''
+                analystBio: '',
+                twitter: '',
+                linkedin: '',
+                telegram: ''
             });
             fetchPosts();
         } catch (error) {
@@ -118,7 +145,10 @@ const ManageAnalysis = () => {
             analysisType: item.analysisType || 'Technical Analysis',
             analystName: item.analystName || '',
             analystImage: item.analystImage || '',
-            analystBio: item.analystBio || ''
+            analystBio: item.analystBio || '',
+            twitter: item.twitter || '',
+            linkedin: item.linkedin || '',
+            telegram: item.telegram || ''
         });
         setEditId(item.id);
         setIsAdding(true);
@@ -141,8 +171,12 @@ const ManageAnalysis = () => {
                             analysisType: 'Technical Analysis',
                             analystName: '',
                             analystImage: '',
-                            analystBio: ''
+                            analystBio: '',
+                            twitter: '',
+                            linkedin: '',
+                            telegram: ''
                         });
+                        fetchProfile();
                     }
                 }}>
                     {isAdding ? 'Cancel' : 'New Analysis'}
@@ -223,6 +257,36 @@ const ManageAnalysis = () => {
                                     value={formData.analystBio}
                                     onChange={e => setFormData({ ...formData, analystBio: e.target.value })}
                                     placeholder="Short bio..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Twitter</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                                    value={formData.twitter}
+                                    onChange={e => setFormData({ ...formData, twitter: e.target.value })}
+                                    placeholder="https://"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">LinkedIn</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                                    value={formData.linkedin}
+                                    onChange={e => setFormData({ ...formData, linkedin: e.target.value })}
+                                    placeholder="https://"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Telegram</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                                    value={formData.telegram}
+                                    onChange={e => setFormData({ ...formData, telegram: e.target.value })}
+                                    placeholder="https://"
                                 />
                             </div>
                         </div>
