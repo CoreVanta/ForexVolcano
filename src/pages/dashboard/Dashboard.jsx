@@ -398,29 +398,36 @@ const Dashboard = () => {
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
                 {/* Tabs */}
-                <div className="flex space-x-6 mb-8 border-b border-gray-800">
+                <div className="flex space-x-6 mb-8 border-b border-gray-800 overflow-x-auto">
                     <button
                         onClick={() => setActiveTab('overview')}
-                        className={`pb-4 px-2 font-medium transition-colors ${activeTab === 'overview' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+                        className={`pb-4 px-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'overview' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
                     >
-                        My Learning
+                        Overview
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('profile')}
+                        className={`pb-4 px-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'profile' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        Profile
                     </button>
                     <button
                         onClick={() => setActiveTab('settings')}
-                        className={`pb-4 px-2 font-medium transition-colors ${activeTab === 'settings' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+                        className={`pb-4 px-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'settings' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
                     >
                         Settings & Preferences
                     </button>
                     <button
-                        onClick={() => setActiveTab('profile')}
-                        className={`pb-4 px-2 font-medium transition-colors ${activeTab === 'profile' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+                        onClick={() => setActiveTab('learning')}
+                        className={`pb-4 px-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'learning' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
                     >
-                        Profile
+                        My Learning
                     </button>
                 </div>
 
-                {activeTab === 'overview' ? (
-                    <>
+                {activeTab === 'overview' && (
+                    <div className="animate-fade-in">
+                        <h2 className="text-xl font-bold text-white mb-6">Account Overview</h2>
                         {/* Stats Grid */}
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-12">
                             <div className="bg-surface overflow-hidden shadow rounded-lg border border-gray-800">
@@ -443,8 +450,43 @@ const Dashboard = () => {
                             </div>
                         </div>
 
+                        {/* Recent Activity Highlight (Optional: First Course) */}
+                        {myCourses.length > 0 && (
+                            <div className="mb-8">
+                                <h3 className="text-lg font-medium text-white mb-4">Jump Back In</h3>
+                                <div className="bg-surface rounded-xl p-6 border border-gray-800 flex flex-col md:flex-row items-center gap-6">
+                                    <div className="w-full md:w-1/3 aspect-video rounded-lg overflow-hidden">
+                                        <img src={myCourses[0].image} alt={myCourses[0].title} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="flex-1 w-full text-center md:text-left">
+                                        <h4 className="text-xl font-bold text-white">{myCourses[0].title}</h4>
+                                        <p className="text-gray-400 mt-2 mb-4">Continue where you left off.</p>
+                                        <Link to={`/academy/${myCourses[0].path || 'General'}/${myCourses[0].id}`}>
+                                            <Button variant="primary">Continue Learning</Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'profile' && (
+                    <DashboardProfile userProfile={userProfile} setUserProfile={setUserProfile} />
+                )}
+
+                {activeTab === 'settings' && (
+                    <DashboardSettings userProfile={userProfile} setUserProfile={setUserProfile} />
+                )}
+
+                {activeTab === 'learning' && (
+                    <div className="animate-fade-in">
                         {/* Course List */}
-                        <h2 className="text-2xl font-bold text-white mb-6">Your Courses</h2>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-white">Your Courses</h2>
+                            <Link to="/academy" className="text-primary text-sm hover:underline">Browse All Courses</Link>
+                        </div>
+
                         {myCourses.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {myCourses.map((course) => (
@@ -486,11 +528,7 @@ const Dashboard = () => {
                                 <Link to="/academy"><Button>Explore Academy</Button></Link>
                             </div>
                         )}
-                    </>
-                ) : activeTab === 'settings' ? (
-                    <DashboardSettings userProfile={userProfile} setUserProfile={setUserProfile} />
-                ) : (
-                    <DashboardProfile userProfile={userProfile} setUserProfile={setUserProfile} />
+                    </div>
                 )}
 
             </div>
