@@ -1,50 +1,156 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { auth, db } from '../../firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc, query, orderBy } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
 
-// Mock Data incase DB is empty
-const MOCK_COURSES = [
-    {
-        id: 'c1',
-        title: 'Forex Foundations: The Bedrock',
-        progress: 100,
-        totalLessons: 12,
-        completedLessons: 12,
-        image: 'https://images.unsplash.com/photo-1611974765270-ca1258634369?q=80&w=1000&auto=format&fit=crop'
-    },
-    {
-        id: 'c2',
-        title: 'Price Action Mastery',
-        progress: 45,
-        totalLessons: 20,
-        completedLessons: 9,
-        image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?q=80&w=1000&auto=format&fit=crop'
-    },
-    {
-        id: 'c3',
-        title: 'Institutional Order Flow',
-        progress: 0,
-        totalLessons: 15,
-        completedLessons: 0,
-        image: 'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?q=80&w=1000&auto=format&fit=crop'
-    }
-];
+// --- Sub-Component: Settings Tab ---
+const DashboardSettings = ({ userProfile, setUserProfile }) => {
+    const [preferences, setPreferences] = useState(userProfile?.preferences || {
+        newsImpacts: ['High', 'Medium', 'Low'],
+        analysisCurrencies: ['XAUUSD', 'EURUSD', 'GBPUSD', 'BTCUSD', 'US30'],
+        analysisTypes: ['Technical', 'Fundamental']
+    });
+    const [saving, setSaving] = useState(false);
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            await setDoc(doc(db, 'users', auth.currentUser.uid), {
+                preferences
+            }, { merge: true });
+            setUserProfile({ ...userProfile, preferences });
+            alert("Preferences saved!");
+        } catch (error) {
+            console.error("Error saving preferences:", error);
+            alert("Failed to save.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const toggleArrayItem = (key, value) => {
+        setPreferences(prev => {
+            const list = prev[key] || [];
+            if (list.includes(value)) {
+                return { ...prev, [key]: list.filter(item => item !== value) };
+            } else {
+                return { ...prev, [key]: [...list, value] };
+            }
+        });
+    };
+
+    return (
+        <div className="bg-surface p-6 rounded-xl border border-gray-800 animate-fade-in">
+            <h2 className="text-xl font-bold text-white mb-6">Dashboard Customization</h2>
+
+            <div className="space-y-8">
+                <div>
+                    <h3 className="text-lg font-medium text-white mb-3">News Notifications</h3>
+                    <p className="text-sm text-gray-400 mb-4">Select which news impacts you want to see.</p>
+                    <div className="flex gap-4">
+                        {['High', 'Medium', 'Low'].map(impact => (
+                            <label key={impact} className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={preferences.newsImpacts?.includes(impact)}
+                                    onChange={() => toggleArrayItem('newsImpacts', impact)}
+                                    className="form-checkbox text-primary rounded bg-gray-900 border-gray-700"
+                                />
+                                <span className="text-gray-300">{impact} Impact</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="border-t border-gray-800 pt-6">
+                    <h3 className="text-lg font-medium text-white mb-3">Analysis Filters</h3>
+                    <p className="text-sm text-gray-400 mb-4">Choose your favorite pairs to track.</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {['XAUUSD', 'EURUSD', 'GBPUSD', 'USDJPY', 'BTCUSD', 'ETHUSD', 'US30', 'NAS100'].map(pair => (
+                            <label key={pair} className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={preferences.analysisCurrencies?.includes(pair)}
+                                    onChange={() => toggleArrayItem('analysisCurrencies', pair)}
+                                    className="form-checkbox text-primary rounded bg-gray-900 border-gray-700"
+                                />
+                                <span className="text-gray-300">{pair}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-8">
+                <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Preferences'}</Button>
+            </div>
+        </div>
+    );
+};
 
 const Dashboard = () => {
     const [userProfile, setUserProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('overview');
+
+    // Progress State
+    const [myCourses, setMyCourses] = useState([]);
+
+    // Stats
+    const [stats, setStats] = useState({ totalProgress: 0, completed: 0, avgQuiz: 0 });
 
     useEffect(() => {
         const fetchUserData = async () => {
             if (auth.currentUser) {
                 try {
+                    // 1. Fetch Profile
                     const docRef = doc(db, 'users', auth.currentUser.uid);
                     const docSnap = await getDoc(docRef);
-
                     if (docSnap.exists()) {
                         setUserProfile(docSnap.data());
                     }
+
+                    // 2. Fetch Course Progress
+                    const progressSnap = await getDocs(collection(db, 'users', auth.currentUser.uid, 'course_progress'));
+                    const progressMap = {};
+                    progressSnap.docs.forEach(d => {
+                        progressMap[d.id] = d.data();
+                    });
+
+                    if (Object.keys(progressMap).length > 0) {
+                        // 3. Fetch Details for these courses (Ideally only fetch IDs needed)
+                        // For simplicity, we fetch all courses and filter, or fetch individually. 
+                        // To show "My Courses", we need course metadata.
+                        const coursesSnap = await getDocs(collection(db, 'courses'));
+                        const coursesData = coursesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                        const myCoursesData = coursesData.filter(c => progressMap[c.id]).map(c => {
+                            const userProgress = progressMap[c.id];
+
+                            // Calculate % (Need total lessons count... simple approximation or fetch lessons count)
+                            // For now we don't have total lessons stored on course doc properly unless we count subcollection.
+                            // Let's assume '12' or '20' or add a field 'totalLessons' to course in ManageCourses.
+                            // Wait, ManageCourses doesn't verify totalLessons count efficiently yet.
+                            // Let's assume we can't get perfect % without fetch. 
+                            // We'll just show "Lessons Completed: X" for now.
+
+                            const completedCount = userProgress.completedLessonIds?.length || 0;
+
+                            return {
+                                ...c,
+                                completedCount,
+                                lastAccessed: userProgress.lastAccessed
+                            };
+                        });
+
+                        setMyCourses(myCoursesData);
+
+                        // Calculate Stats
+                        const totalCompleted = myCoursesData.reduce((acc, c) => acc + c.completedCount, 0);
+                        setStats({ totalProgress: totalCompleted, completed: myCoursesData.length, avgQuiz: 0 }); // AvgQuiz placeholder
+                    }
+
                 } catch (error) {
                     console.error("Error fetching user data:", error);
                 } finally {
@@ -59,7 +165,7 @@ const Dashboard = () => {
     const displayName = userProfile?.username || auth.currentUser?.displayName || 'Trader';
 
     return (
-        <div className="min-h-screen bg-background text-white">
+        <div className="min-h-screen bg-background text-white animate-fade-in">
             {/* Top Welcome Section */}
             <div className="bg-surface border-b border-gray-800">
                 <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -83,78 +189,95 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-12">
-                    {/* Stat 1 */}
-                    <div className="bg-surface overflow-hidden shadow rounded-lg border border-gray-800">
-                        <div className="px-4 py-5 sm:p-6">
-                            <dt className="text-sm font-medium text-gray-400 truncate">Total Progress</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-white">48%</dd>
-                        </div>
-                    </div>
-                    {/* Stat 2 */}
-                    <div className="bg-surface overflow-hidden shadow rounded-lg border border-gray-800">
-                        <div className="px-4 py-5 sm:p-6">
-                            <dt className="text-sm font-medium text-gray-400 truncate">Courses Completed</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-primary">1</dd>
-                        </div>
-                    </div>
-                    {/* Stat 3 */}
-                    <div className="bg-surface overflow-hidden shadow rounded-lg border border-gray-800">
-                        <div className="px-4 py-5 sm:p-6">
-                            <dt className="text-sm font-medium text-gray-400 truncate">Quiz Score Avg</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-secondary">92%</dd>
-                        </div>
-                    </div>
+                {/* Tabs */}
+                <div className="flex space-x-6 mb-8 border-b border-gray-800">
+                    <button
+                        onClick={() => setActiveTab('overview')}
+                        className={`pb-4 px-2 font-medium transition-colors ${activeTab === 'overview' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        My Learning
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('settings')}
+                        className={`pb-4 px-2 font-medium transition-colors ${activeTab === 'settings' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        Settings & Preferences
+                    </button>
                 </div>
 
-                {/* Course List */}
-                <h2 className="text-2xl font-bold text-white mb-6">Your Courses</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {MOCK_COURSES.map((course) => (
-                        <div key={course.id} className="bg-surface rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition-colors group">
-                            <div className="h-48 overflow-hidden relative">
-                                <img
-                                    src={course.image}
-                                    alt={course.title}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button variant="primary" size="sm">Continue Learning</Button>
+                {activeTab === 'overview' ? (
+                    <>
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-12">
+                            <div className="bg-surface overflow-hidden shadow rounded-lg border border-gray-800">
+                                <div className="px-4 py-5 sm:p-6">
+                                    <dt className="text-sm font-medium text-gray-400 truncate">Lessons Completed</dt>
+                                    <dd className="mt-1 text-3xl font-semibold text-white">{stats.totalProgress}</dd>
                                 </div>
                             </div>
-                            <div className="p-6">
-                                <h3 className="text-lg font-bold text-white mb-2">{course.title}</h3>
-
-                                {/* Progress Bar */}
-                                <div className="mt-4">
-                                    <div className="flex justify-between text-sm text-gray-400 mb-1">
-                                        <span>Progress</span>
-                                        <span>{course.progress}%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-700 rounded-full h-2">
-                                        <div
-                                            className={`h-2 rounded-full ${course.progress === 100 ? 'bg-primary' : 'bg-secondary'}`}
-                                            style={{ width: `${course.progress}%` }}
-                                        ></div>
-                                    </div>
+                            <div className="bg-surface overflow-hidden shadow rounded-lg border border-gray-800">
+                                <div className="px-4 py-5 sm:p-6">
+                                    <dt className="text-sm font-medium text-gray-400 truncate">Active Courses</dt>
+                                    <dd className="mt-1 text-3xl font-semibold text-primary">{stats.completed}</dd>
                                 </div>
-
-                                <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
-                                    <span>{course.completedLessons}/{course.totalLessons} Lessons</span>
-                                    {course.progress === 100 && (
-                                        <span className="text-primary flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                                            Completed
-                                        </span>
-                                    )}
+                            </div>
+                            <div className="bg-surface overflow-hidden shadow rounded-lg border border-gray-800">
+                                <div className="px-4 py-5 sm:p-6">
+                                    <dt className="text-sm font-medium text-gray-400 truncate">Quiz Score Avg</dt>
+                                    <dd className="mt-1 text-3xl font-semibold text-secondary">N/A</dd>
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div>
+
+                        {/* Course List */}
+                        <h2 className="text-2xl font-bold text-white mb-6">Your Courses</h2>
+                        {myCourses.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {myCourses.map((course) => (
+                                    <div key={course.id} className="bg-surface rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition-colors group">
+                                        <div className="h-48 overflow-hidden relative">
+                                            <img
+                                                src={course.image}
+                                                alt={course.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Link to={`/academy/${course.path || 'General'}/${course.id}`}>
+                                                    <Button variant="primary" size="sm">Continue Learning</Button>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="text-lg font-bold text-white mb-2">{course.title}</h3>
+
+                                            <div className="mt-4">
+                                                <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                                    <span>Lessons Completed</span>
+                                                    <span>{course.completedCount}</span>
+                                                </div>
+                                                <div className="w-full bg-gray-700 rounded-full h-2">
+                                                    <div
+                                                        className="h-2 rounded-full bg-secondary"
+                                                        style={{ width: `${Math.min((course.completedCount / 10) * 100, 100)}%` }} // Placeholder % calc
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-20 bg-surface rounded-xl border border-gray-800">
+                                <p className="text-gray-400 mb-4">You haven't started any courses yet.</p>
+                                <Link to="/academy"><Button>Explore Academy</Button></Link>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <DashboardSettings userProfile={userProfile} setUserProfile={setUserProfile} />
+                )}
 
             </div>
         </div>
