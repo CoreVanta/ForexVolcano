@@ -17,6 +17,9 @@ import ManageAnalysis from './pages/admin/ManageAnalysis';
 import ManageCourses from './pages/admin/ManageCourses';
 import AdminProfile from './pages/admin/AdminProfile';
 import CourseView from './pages/dashboard/CourseView';
+import Academy from './pages/Academy';
+import AcademyPath from './pages/AcademyPath';
+import AcademyCourse from './pages/AcademyCourse';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -58,6 +61,10 @@ function App() {
             <Route path="/news/:id" element={<NewsDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+
+            <Route path="/academy" element={<Academy />} />
+            <Route path="/academy/:path" element={<AcademyPath />} />
+            <Route path="/academy/:path/:courseId" element={<AcademyCourse />} />
 
             <Route path="/dashboard" element={
               <ProtectedRoute>

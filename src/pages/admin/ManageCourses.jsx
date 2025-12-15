@@ -31,7 +31,8 @@ const ManageCourses = () => {
     const [editCourseId, setEditCourseId] = useState(null);
 
     // Course Form State
-    const [courseForm, setCourseForm] = useState({ title: '', description: '', image: '', level: 'Beginner' });
+    const [courseForm, setCourseForm] = useState({ title: '', path: '', description: '', image: '', level: 'Beginner' });
+    const [existingPaths, setExistingPaths] = useState([]);
 
     useEffect(() => {
         fetchCourses();
@@ -40,17 +41,21 @@ const ManageCourses = () => {
     const fetchCourses = async () => {
         setLoading(true);
         try {
-            const q = query(collection(db, 'courses'), orderBy('order', 'asc')); // Assuming 'order' field or just default
-            // If 'order' doesn't exist yet, it might throw or return empty depending on index. safe fallback:
-            // const q = collection(db, 'courses'); 
+            const q = query(collection(db, 'courses'), orderBy('order', 'asc'));
             const snapshot = await getDocs(q);
             const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setCourses(data);
+
+            // Extract unique paths for suggestions
+            const paths = [...new Set(data.map(c => c.path).filter(p => p))];
+            setExistingPaths(paths);
         } catch (error) {
             console.error("Error fetching courses:", error);
-            // Fallback if index missing
             const snapshot = await getDocs(collection(db, 'courses'));
-            setCourses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setCourses(data);
+            const paths = [...new Set(data.map(c => c.path).filter(p => p))];
+            setExistingPaths(paths);
         } finally {
             setLoading(false);
         }
@@ -73,7 +78,7 @@ const ManageCourses = () => {
             }
             setIsAddingCourse(false);
             setEditCourseId(null);
-            setCourseForm({ title: '', description: '', image: '', level: 'Beginner' });
+            setCourseForm({ title: '', path: '', description: '', image: '', level: 'Beginner' });
             fetchCourses();
         } catch (error) {
             console.error("Error saving course:", error);
@@ -85,6 +90,7 @@ const ManageCourses = () => {
         setCourseForm({
             title: course.title,
             description: course.description,
+            path: course.path || '',
             image: course.image,
             level: course.level || 'Beginner'
         });
@@ -120,7 +126,7 @@ const ManageCourses = () => {
                 <h1 className="text-3xl font-bold text-white">Manage Courses</h1>
                 <Button onClick={() => {
                     setIsAddingCourse(!isAddingCourse);
-                    if (isAddingCourse) { setEditCourseId(null); setCourseForm({ title: '', description: '', image: '', level: 'Beginner' }); }
+                    if (isAddingCourse) { setEditCourseId(null); setCourseForm({ title: '', path: '', description: '', image: '', level: 'Beginner' }); }
                 }}>
                     {isAddingCourse ? 'Cancel' : 'New Course'}
                 </Button>
@@ -130,7 +136,7 @@ const ManageCourses = () => {
                 <div className="bg-surface p-6 rounded-xl border border-gray-800 mb-8 animate-fade-in">
                     <h2 className="text-xl font-bold text-white mb-4">{editCourseId ? 'Edit Course' : 'Create New Course'}</h2>
                     <form onSubmit={handleAddCourse} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Course Title</label>
                                 <input
@@ -140,6 +146,20 @@ const ManageCourses = () => {
                                     value={courseForm.title}
                                     onChange={e => setCourseForm({ ...courseForm, title: e.target.value })}
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Path / Category</label>
+                                <input
+                                    type="text"
+                                    list="paths-list"
+                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                                    value={courseForm.path}
+                                    onChange={e => setCourseForm({ ...courseForm, path: e.target.value })}
+                                    placeholder="e.g. Technical Analysis"
+                                />
+                                <datalist id="paths-list">
+                                    {existingPaths.map(p => <option key={p} value={p} />)}
+                                </datalist>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Level</label>
@@ -198,7 +218,10 @@ const ManageCourses = () => {
                             </div>
                         </div>
                         <div className="p-5">
-                            <h3 className="text-lg font-bold text-white mb-2">{course.title}</h3>
+                            <div className="flex justify-between items-start">
+                                <h3 className="text-lg font-bold text-white mb-2">{course.title}</h3>
+                                {course.path && <span className="bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded">{course.path}</span>}
+                            </div>
                             <p className="text-gray-400 text-sm line-clamp-2 mb-4">{course.description}</p>
                             <Button variant="outline" size="sm" className="w-full" onClick={() => setSelectedCourse(course)}>
                                 Manage Lessons
