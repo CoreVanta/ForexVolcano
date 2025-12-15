@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase/config';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db, auth } from '../../firebase/config';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import Button from '../../components/ui/Button';
 
 const AdminProfile = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [user, setUser] = useState(null);
     const [formData, setFormData] = useState({
         analystName: '',
         analystImage: '',
@@ -16,28 +18,43 @@ const AdminProfile = () => {
     });
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const docRef = doc(db, 'settings', 'profile');
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    setFormData(prev => ({ ...prev, ...docSnap.data() }));
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+                try {
+                    const docRef = doc(db, 'users', currentUser.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        // Merge existing user data with form data structure
+                        const data = docSnap.data();
+                        setFormData(prev => ({
+                            ...prev,
+                            analystName: data.analystName || '',
+                            analystImage: data.analystImage || '',
+                            analystBio: data.analystBio || '',
+                            twitter: data.twitter || '',
+                            linkedin: data.linkedin || '',
+                            telegram: data.telegram || ''
+                        }));
+                    }
+                } catch (error) {
+                    console.error("Error fetching profile:", error);
                 }
-            } catch (error) {
-                console.error("Error fetching profile:", error);
-            } finally {
-                setLoading(false);
             }
-        };
+            setLoading(false);
+        });
 
-        fetchProfile();
+        return () => unsubscribe();
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!user) return;
+
         setSaving(true);
         try {
-            await setDoc(doc(db, 'settings', 'profile'), formData);
+            // merge: true is crucial here if we don't want to overwrite other user fields like 'role'
+            await setDoc(doc(db, 'users', user.uid), formData, { merge: true });
             alert("Profile updated successfully!");
         } catch (error) {
             console.error("Error saving profile:", error);

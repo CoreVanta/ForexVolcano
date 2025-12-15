@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase/config';
+import { db, auth } from '../../firebase/config';
 import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, getDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import Button from '../../components/ui/Button';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -39,21 +40,24 @@ const ManageAnalysis = () => {
 
     const [profileData, setProfileData] = useState({});
 
-    const fetchProfile = async () => {
-        try {
-            const docRef = doc(db, 'settings', 'profile');
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                setProfileData(docSnap.data());
-            }
-        } catch (error) {
-            console.error("Error fetching profile:", error);
-        }
-    };
-
     useEffect(() => {
         fetchPosts();
-        fetchProfile();
+
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const docRef = doc(db, 'users', user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        setProfileData(docSnap.data());
+                    }
+                } catch (error) {
+                    console.error("Error fetching profile:", error);
+                }
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const fetchPosts = async () => {

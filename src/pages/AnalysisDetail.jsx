@@ -105,7 +105,7 @@ const AnalysisDetail = () => {
                                     </div>
                                     <div className="text-center sm:text-left">
                                         <h4 className="text-xl font-bold text-white mb-2">{post.analystName || 'Volcano Analyst'}</h4>
-                                        <p className="text-gray-400 leading-relaxed mb-4">
+                                        <p className="text-gray-400 leading-relaxed mb-4 whitespace-pre-wrap">
                                             {post.analystBio || 'Professional market analyst at Forex Volcano.'}
                                         </p>
 
