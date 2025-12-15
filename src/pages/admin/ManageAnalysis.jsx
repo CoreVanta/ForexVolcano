@@ -194,70 +194,7 @@ const ManageAnalysis = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-gray-800 pt-4 mt-4">
-                            <div className="md:col-span-3">
-                                <h3 className="text-white font-semibold mb-2">Analyst Details</h3>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Analyst Name</label>
-                                <input
-                                    type="text"
-                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                    value={formData.analystName}
-                                    onChange={e => setFormData({ ...formData, analystName: e.target.value })}
-                                    placeholder="e.g. John Doe"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Analyst Image (URL)</label>
-                                <input
-                                    type="url"
-                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                    value={formData.analystImage}
-                                    onChange={e => setFormData({ ...formData, analystImage: e.target.value })}
-                                    placeholder="https://..."
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Analyst Bio</label>
-                                <textarea
-                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none h-[42px] min-h-[42px] resize-none overflow-hidden hover:overflow-y-auto focus:h-24 transition-all"
-                                    value={formData.analystBio}
-                                    onChange={e => setFormData({ ...formData, analystBio: e.target.value })}
-                                    placeholder="Short bio..."
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Twitter</label>
-                                <input
-                                    type="url"
-                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                    value={formData.twitter}
-                                    onChange={e => setFormData({ ...formData, twitter: e.target.value })}
-                                    placeholder="https://"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">LinkedIn</label>
-                                <input
-                                    type="url"
-                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                    value={formData.linkedin}
-                                    onChange={e => setFormData({ ...formData, linkedin: e.target.value })}
-                                    placeholder="https://"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Telegram</label>
-                                <input
-                                    type="url"
-                                    className="w-full bg-background border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                                    value={formData.telegram}
-                                    onChange={e => setFormData({ ...formData, telegram: e.target.value })}
-                                    placeholder="https://"
-                                />
-                            </div>
-                        </div>
+
 
                         <div className="grid grid-cols-1 gap-4">
                             <div>
