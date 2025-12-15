@@ -90,9 +90,7 @@ const DashboardSettings = ({ userProfile, setUserProfile }) => {
 };
 
 // --- Sub-Component: Profile Tab ---
-import { storage } from '../../firebase/config';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { where } from 'firebase/firestore';
+// --- Sub-Component: Profile Tab ---
 
 const DashboardProfile = ({ userProfile, setUserProfile }) => {
     const [username, setUsername] = useState(userProfile?.username || '');
@@ -100,24 +98,75 @@ const DashboardProfile = ({ userProfile, setUserProfile }) => {
     const [uploading, setUploading] = useState(false);
     const [saving, setSaving] = useState(false);
 
+    // Helper: Compress Image to Base64
+    const compressImage = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 300;
+                    const MAX_HEIGHT = 300;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress to JPEG with 0.7 quality
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    resolve(dataUrl);
+                };
+                img.onerror = (error) => reject(error);
+            };
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        // Basic validation: warn if very large, though we compress anyway
+        if (file.size > 5 * 1024 * 1024) {
+            console.log("Large file detected, compression will be applied.");
+        }
+
         setUploading(true);
         try {
-            const storageRef = ref(storage, `profile_images/${auth.currentUser.uid}`);
-            await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(storageRef);
+            // Client-side compression
+            const base64Image = await compressImage(file);
+
+            // Check size of base64 string (approx limit for Firestore field is 1MB)
+            if (base64Image.length > 500000) {
+                console.warn("Image might be too large for smooth database performance");
+            }
 
             await setDoc(doc(db, 'users', auth.currentUser.uid), {
-                avatar_url: url
+                avatar_url: base64Image
             }, { merge: true });
 
-            setUserProfile({ ...userProfile, avatar_url: url });
+            setUserProfile({ ...userProfile, avatar_url: base64Image });
         } catch (error) {
-            console.error("Error uploading image:", error);
-            alert("Failed to upload image.");
+            console.error("Error processing image:", error);
+            alert("Failed to process image.");
         } finally {
             setUploading(false);
         }
@@ -175,7 +224,7 @@ const DashboardProfile = ({ userProfile, setUserProfile }) => {
                             className="absolute inset-0 opacity-0 cursor-pointer"
                         />
                     </div>
-                    {uploading && <span className="text-xs text-primary">Uploading...</span>}
+                    {uploading && <span className="text-xs text-primary">Compressing & Saving...</span>}
                 </div>
 
                 {/* Info Section */}
