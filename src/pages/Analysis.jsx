@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { db } from '../firebase/config';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
+import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 
 const MOCK_ANALYSIS = [
     {
@@ -46,22 +46,34 @@ const Analysis = () => {
     useEffect(() => {
         const fetchAnalysis = async () => {
             try {
-                const q = query(collection(db, "analysis"), orderBy("timestamp", "desc")); // Assuming timestamp field exists
+                const q = query(collection(db, "analysis"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
-                const fetchedPosts = querySnapshot.docs.map(doc => ({
+                let fetchedPosts = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
 
+                // Filter by User Preferences
+                if (auth.currentUser) {
+                    const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                    if (userDoc.exists()) {
+                        const prefs = userDoc.data().preferences;
+                        if (prefs && prefs.analysisCurrencies && prefs.analysisCurrencies.length > 0) {
+                            // If user has preferred pairs, default filter to those, OR strict filter?
+                            // User request: "can choose ... only". Let's strict filter the list.
+                            fetchedPosts = fetchedPosts.filter(post => prefs.analysisCurrencies.includes(post.pair));
+                        }
+                    }
+                }
+
                 if (fetchedPosts.length > 0) {
                     setPosts(fetchedPosts);
                 } else {
-                    // Fallback to mock data if DB is empty
-                    setPosts(MOCK_ANALYSIS);
+                    if (!auth.currentUser) setPosts(MOCK_ANALYSIS);
+                    else setPosts([]);
                 }
             } catch (error) {
                 console.error("Error fetching analysis:", error);
-                // Fallback to mock data on error (e.g. permission issues or offline)
                 setPosts(MOCK_ANALYSIS);
             } finally {
                 setLoading(false);

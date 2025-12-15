@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
-import { db } from '../firebase/config';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
+import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 
 const MOCK_NEWS = [
     {
@@ -60,17 +60,33 @@ const News = () => {
     useEffect(() => {
         const fetchNews = async () => {
             try {
+                // 1. Fetch News
                 const q = query(collection(db, "news"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
-                const fetchedNews = querySnapshot.docs.map(doc => ({
+                let fetchedNews = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
 
+                // 2. Filter by User Preferences
+                if (auth.currentUser) {
+                    const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                    if (userDoc.exists()) {
+                        const prefs = userDoc.data().preferences;
+                        if (prefs && prefs.newsImpacts && prefs.newsImpacts.length > 0) {
+                            fetchedNews = fetchedNews.filter(item => prefs.newsImpacts.includes(item.impact));
+                        }
+                    }
+                }
+
                 if (fetchedNews.length > 0) {
                     setNews(fetchedNews);
                 } else {
-                    setNews(MOCK_NEWS);
+                    // Only show mock if NOT logged in or really empty? 
+                    // If logged in and filter results in 0, we should probably show 0 (and a message), not mock data.
+                    // But for now keeping simple logic to avoid breaking flow.
+                    if (!auth.currentUser) setNews(MOCK_NEWS);
+                    else setNews([]);
                 }
             } catch (error) {
                 console.error("Error fetching news:", error);
