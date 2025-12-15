@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { auth, db } from '../../firebase/config';
-import { doc, getDoc, collection, getDocs, setDoc, query, orderBy } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc, query, orderBy, where } from 'firebase/firestore';
 import Button from '../../components/ui/Button';
 
 // --- Sub-Component: Settings Tab ---
@@ -84,6 +84,139 @@ const DashboardSettings = ({ userProfile, setUserProfile }) => {
 
             <div className="mt-8">
                 <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Preferences'}</Button>
+            </div>
+        </div>
+    );
+};
+
+// --- Sub-Component: Profile Tab ---
+import { storage } from '../../firebase/config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { where } from 'firebase/firestore';
+
+const DashboardProfile = ({ userProfile, setUserProfile }) => {
+    const [username, setUsername] = useState(userProfile?.username || '');
+    const [bio, setBio] = useState(userProfile?.bio || '');
+    const [uploading, setUploading] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const storageRef = ref(storage, `profile_images/${auth.currentUser.uid}`);
+            await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(storageRef);
+
+            await setDoc(doc(db, 'users', auth.currentUser.uid), {
+                avatar_url: url
+            }, { merge: true });
+
+            setUserProfile({ ...userProfile, avatar_url: url });
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            alert("Failed to upload image.");
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        setSaving(true);
+        try {
+            // Check username uniqueness if changed
+            if (username !== userProfile?.username) {
+                const q = query(collection(db, 'users'), where('username', '==', username));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    alert("Username is already taken. Please choose another.");
+                    setSaving(false);
+                    return;
+                }
+            }
+
+            await setDoc(doc(db, 'users', auth.currentUser.uid), {
+                username,
+                bio
+            }, { merge: true });
+
+            setUserProfile({ ...userProfile, username, bio });
+            alert("Profile updated!");
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            alert("Failed to save profile.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div className="bg-surface p-6 rounded-xl border border-gray-800 animate-fade-in">
+            <h2 className="text-xl font-bold text-white mb-6">Profile Settings</h2>
+
+            <div className="flex flex-col md:flex-row gap-8">
+                {/* Avatar Section */}
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-800 relative group">
+                        <img
+                            src={userProfile?.avatar_url || `https://ui-avatars.com/api/?name=${userProfile?.username || 'User'}`}
+                            alt="Avatar"
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <span className="text-xs text-white">Change</span>
+                        </div>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
+                    </div>
+                    {uploading && <span className="text-xs text-primary">Uploading...</span>}
+                </div>
+
+                {/* Info Section */}
+                <div className="flex-1 space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Username (Public)</label>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-primary focus:outline-none"
+                            placeholder="e.g. CryptoKing"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Unique handle for your public profile.</p>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Bio</label>
+                        <textarea
+                            value={bio}
+                            onChange={(e) => setBio(e.target.value)}
+                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-primary focus:outline-none h-24 resize-none"
+                            placeholder="Tell us about your trading journey..."
+                        />
+                    </div>
+
+                    <div>
+                        <Button onClick={handleSaveProfile} disabled={saving}>
+                            {saving ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                    </div>
+
+                    {userProfile?.username && (
+                        <div className="mt-4 p-4 bg-gray-900/50 rounded-lg border border-gray-800 flex items-center justify-between">
+                            <span className="text-sm text-gray-400">Your Public Profile:</span>
+                            <Link to={`/profile/${userProfile.username}`} className="text-primary hover:underline text-sm font-medium">
+                                View Public Page &rarr;
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -205,6 +338,12 @@ const Dashboard = () => {
                     >
                         Settings & Preferences
                     </button>
+                    <button
+                        onClick={() => setActiveTab('profile')}
+                        className={`pb-4 px-2 font-medium transition-colors ${activeTab === 'profile' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        Profile
+                    </button>
                 </div>
 
                 {activeTab === 'overview' ? (
@@ -275,8 +414,10 @@ const Dashboard = () => {
                             </div>
                         )}
                     </>
-                ) : (
+                ) : activeTab === 'settings' ? (
                     <DashboardSettings userProfile={userProfile} setUserProfile={setUserProfile} />
+                ) : (
+                    <DashboardProfile userProfile={userProfile} setUserProfile={setUserProfile} />
                 )}
 
             </div>

@@ -20,6 +20,7 @@ import CourseView from './pages/dashboard/CourseView';
 import Academy from './pages/Academy';
 import AcademyPath from './pages/AcademyPath';
 import AcademyCourse from './pages/AcademyCourse';
+import UserProfile from './pages/UserProfile';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -65,6 +66,8 @@ function App() {
             <Route path="/academy" element={<Academy />} />
             <Route path="/academy/:path" element={<AcademyPath />} />
             <Route path="/academy/:path/:courseId" element={<AcademyCourse />} />
+
+            <Route path="/profile/:username" element={<UserProfile />} />
 
             <Route path="/dashboard" element={
               <ProtectedRoute>
