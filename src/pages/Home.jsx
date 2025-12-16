@@ -156,6 +156,39 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* SECTION 1.5: Community & Ad (2/3 Community, 1/3 Ad) */}
+            <section className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    {/* Community (2/3) */}
+                    <div className="lg:col-span-2 relative h-full min-h-[300px] bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-gray-800 p-8 flex flex-col justify-center items-center text-center overflow-hidden">
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+                        <div className="relative z-10">
+                            <h3 className="text-3xl font-bold text-white mb-4">Join the Community</h3>
+                            <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                                Connect with other traders, share your charts, and get real-time feedback. The journey is better together.
+                            </p>
+                            <Link to="/community">
+                                <Button size="lg" className="px-10 shadow-lg shadow-primary/25 animate-pulse">
+                                    Join Discussion
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Ad Box (1/3) */}
+                    <div className="lg:col-span-1 h-full min-h-[300px] bg-surface rounded-xl border border-gray-800 flex flex-col items-center justify-center relative overflow-hidden group">
+                        <div className="text-center p-6">
+                            <span className="text-gray-600 font-bold tracking-widest text-xs block mb-2">ADVERTISEMENT</span>
+                            <div className="w-full aspect-square max-w-[300px] mx-auto bg-gray-900/50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-800">
+                                <span className="text-gray-700 font-medium">Standard Ad Size</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
             {/* SECTION 2: News & Economic Calendar (50/50 Split) */}
             <section className="py-12 w-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -205,44 +238,29 @@ const Home = () => {
 
             {/* Academy & Community CTA (Full Width) */}
             <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full border-t border-gray-800 mt-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <h2 className="text-4xl font-bold text-white mb-6">Level Up Your Trading Skills</h2>
-                        <p className="text-gray-400 text-lg mb-8">
-                            Join our comprehensive academy with courses designed for every level. From interpreting candlestick patterns to mastering complex strategies.
-                        </p>
-                        <div className="space-y-4 mb-8">
-                            {featuredCourses.slice(0, 2).map(course => (
-                                <div key={course.id} className="flex items-center gap-4 bg-surface p-4 rounded-xl border border-gray-800">
-                                    <div className="h-16 w-24 rounded-lg overflow-hidden flex-shrink-0">
-                                        <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-white">{course.title}</h4>
-                                        <p className="text-sm text-gray-500">{course.lessons?.length || 0} Lessons • {course.level || 'All Levels'}</p>
-                                    </div>
+                <div className="max-w-4xl mx-auto text-center">
+                    <h2 className="text-4xl font-bold text-white mb-6">Level Up Your Trading Skills</h2>
+                    <p className="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
+                        Join our comprehensive academy with courses designed for every level. From interpreting candlestick patterns to mastering complex strategies.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 text-left">
+                        {featuredCourses.slice(0, 2).map(course => (
+                            <div key={course.id} className="flex items-center gap-4 bg-surface p-4 rounded-xl border border-gray-800">
+                                <div className="h-20 w-32 rounded-lg overflow-hidden flex-shrink-0">
+                                    <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
                                 </div>
-                            ))}
-                        </div>
-                        <Link to="/academy">
-                            <Button variant="secondary">Start Learning Free</Button>
-                        </Link>
+                                <div>
+                                    <h4 className="font-bold text-white text-lg">{course.title}</h4>
+                                    <p className="text-sm text-gray-500">{course.lessons?.length || 0} Lessons • {course.level || 'All Levels'}</p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
-                    <div className="relative h-full min-h-[400px] bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-gray-800 p-8 flex flex-col justify-center items-center text-center overflow-hidden">
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-                        <div className="relative z-10">
-                            <h3 className="text-3xl font-bold text-white mb-4">Join the Community</h3>
-                            <p className="text-gray-400 mb-8 max-w-md mx-auto">
-                                Connect with other traders, share your charts, and get real-time feedback. The journey is better together.
-                            </p>
-                            <Link to="/community">
-                                <Button size="lg" className="w-full sm:w-auto px-10 shadow-lg shadow-primary/25 animate-pulse">
-                                    Join Discussion
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
+                    <Link to="/academy">
+                        <Button variant="secondary" size="lg">Start Learning Free</Button>
+                    </Link>
                 </div>
             </section>
         </div>
