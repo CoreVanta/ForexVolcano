@@ -3,7 +3,43 @@
 
 /* Custom Base Styles */
 @layer base {
+  :root {
+    /* Light Theme (Professional Slate) */
+    --color-background: 248 250 252;
+    /* Slate 50 */
+    --color-surface: 255 255 255;
+    /* White */
+    --color-primary: 16 185 129;
+    /* Emerald 500 */
+    --color-secondary: 239 68 68;
+    /* Red 500 */
+    --color-accent: 249 115 22;
+    /* Orange 500 */
+    --color-text: 15 23 42;
+    /* Slate 900 */
+    --color-text-muted: 100 116 139;
+    /* Slate 500 */
+  }
+
+  .dark {
+    /* Dark Theme (Original) - Converted to RGB channels */
+    --color-background: 10 14 23;
+    /* #0a0e17 */
+    --color-surface: 17 24 39;
+    /* #111827 */
+    --color-primary: 16 185 129;
+    /* #10b981 */
+    --color-secondary: 239 68 68;
+    /* #ef4444 */
+    --color-accent: 249 115 22;
+    /* #f97316 */
+    --color-text: 243 244 246;
+    /* #f3f4f6 */
+    --color-text-muted: 156 163 175;
+    /* #9ca3af */
+  }
+
   body {
-    @apply bg-background text-text font-sans antialiased;
+    @apply bg-background text-text font-sans antialiased transition-colors duration-300;
   }
 }

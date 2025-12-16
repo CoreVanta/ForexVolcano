@@ -7,13 +7,13 @@ export default {
     theme: {
         extend: {
             colors: {
-                background: '#0a0e17', // Dark Blue/Black
-                surface: '#111827', // Slightly lighter dark
-                primary: '#10b981', // Green (Profit/Up)
-                secondary: '#ef4444', // Red (Risk/Down)
-                accent: '#f97316', // Orange (Volcano/Warning)
-                text: '#f3f4f6', // Light gray/white text
-                'text-muted': '#9ca3af',
+                background: 'rgb(var(--color-background) / <alpha-value>)',
+                surface: 'rgb(var(--color-surface) / <alpha-value>)',
+                primary: 'rgb(var(--color-primary) / <alpha-value>)',
+                secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+                accent: 'rgb(var(--color-accent) / <alpha-value>)',
+                text: 'rgb(var(--color-text) / <alpha-value>)',
+                'text-muted': 'rgb(var(--color-text-muted) / <alpha-value>)',
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'], // Assuming Inter or system font
