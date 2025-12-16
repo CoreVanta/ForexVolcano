@@ -194,7 +194,7 @@ const Home = () => {
                         {/* Calendar Column */}
                         <div>
                             <SectionHeader title="Economic Calendar" link="/calendar" linkText="Full Calendar" variant="secondary" />
-                            <div className="bg-background rounded-xl border border-gray-800 overflow-hidden h-full">
+                            <div className="bg-transparent overflow-hidden h-full">
                                 <EconomicCalendar compact={true} />
                             </div>
                         </div>
