@@ -106,108 +106,110 @@ const Home = () => {
             />
             <Hero />
 
-            {/* Main Content Area with Sidebar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* SECTION 1: Analysis & Market Watch */}
+            <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
 
-                    {/* Left Column: Analysis & News */}
-                    <div className="lg:col-span-3 space-y-16">
-
-                        {/* Latest Analysis */}
-                        <section>
-                            <SectionHeader title="Latest Market Analysis" link="/analysis" linkText="View All Analysis" />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {latestAnalysis.map(item => (
-                                    <Link key={item.id} to={`/analysis/${item.id}`} className="group block h-full">
-                                        <div className="bg-surface rounded-xl overflow-hidden border border-gray-800 h-full hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-primary/10">
-                                            <div className="h-48 overflow-hidden relative">
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.title}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                />
-                                                <div className="absolute top-4 left-4">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${item.type === 'Technical' ? 'bg-blue-600' : 'bg-purple-600'
-                                                        }`}>
-                                                        {item.type}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="p-6">
-                                                <div className="flex justify-between items-center mb-3">
-                                                    <span className="text-xs font-bold text-primary px-2 py-1 bg-primary/10 rounded">{item.pair}</span>
-                                                    <span className="text-xs text-gray-500">
-                                                        {item.createdAt?.seconds ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
-                                                    </span>
-                                                </div>
-                                                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-2">{item.title}</h3>
-                                                <p className="text-gray-400 text-sm line-clamp-3">{stripHtml(item.content).substring(0, 100)}...</p>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Breaking News */}
-                        <section>
-                            <SectionHeader title="Breaking Market News" link="/news" linkText="Read All News" />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {latestNews.map(item => (
-                                    <Link key={item.id} to={`/news/${item.id}`} className="block group">
-                                        <div className="bg-background rounded-xl p-6 border border-gray-800 hover:border-gray-600 transition-colors h-full flex flex-col">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <span className={`px-2 py-1 rounded text-xs font-bold ${item.impact === 'High' ? 'bg-red-500/20 text-red-500' :
-                                                    item.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-500' :
-                                                        'bg-green-500/20 text-green-500'
+                    {/* Left: Latest Market Analysis (3 Columns wide) */}
+                    <div className="lg:col-span-3">
+                        <SectionHeader title="Latest Market Analysis" link="/analysis" linkText="View All" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {latestAnalysis.map(item => (
+                                <Link key={item.id} to={`/analysis/${item.id}`} className="group block h-full">
+                                    <div className="bg-surface rounded-xl overflow-hidden border border-gray-800 h-full hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-primary/10 flex flex-col">
+                                        <div className="h-40 overflow-hidden relative">
+                                            <img
+                                                src={item.image}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                            <div className="absolute top-2 left-2">
+                                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-wider ${item.type === 'Technical' ? 'bg-blue-600/90' : 'bg-purple-600/90'
                                                     }`}>
-                                                    {item.impact} Impact
+                                                    {item.type}
                                                 </span>
-                                                <span className="text-xs text-gray-500">
-                                                    {item.timestamp?.seconds ? new Date(item.timestamp.seconds * 1000).toLocaleDateString() : 'Just now'}
-                                                </span>
-                                            </div>
-                                            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                                            <div className="flex gap-2 mt-auto pt-4">
-                                                {item.currencies?.map(curr => (
-                                                    <span key={curr} className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{curr}</span>
-                                                ))}
                                             </div>
                                         </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </section>
-
+                                        <div className="p-4 flex flex-col flex-grow">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20">{item.pair}</span>
+                                                <span className="text-[10px] text-gray-500">
+                                                    {item.createdAt?.seconds ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'Today'}
+                                                </span>
+                                            </div>
+                                            <h3 className="text-base font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-tight">{item.title}</h3>
+                                            <p className="text-gray-400 text-xs line-clamp-2 mt-auto">{stripHtml(item.content).substring(0, 80)}...</p>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Right Column: Market Watch Sidebar */}
-                    <div className="lg:col-span-1">
-                        <div className="sticky top-24 space-y-8">
+                    {/* Right: Market Watch (1 Column wide) */}
+                    <div className="lg:col-span-1 mt-12 lg:mt-0">
+                        <div className="bg-surface rounded-xl border border-gray-800 p-1">
                             <MarketWatch />
-
-                            {/* Economic Calendar Widget */}
-                            <div className="bg-surface rounded-xl border border-gray-800 overflow-hidden">
-                                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/50">
-                                    <h3 className="font-bold text-white text-sm">Economic Events</h3>
-                                    <Link to="/calendar" className="text-xs text-primary hover:underline">View All</Link>
-                                </div>
-                                <EconomicCalendar compact={true} />
-                            </div>
-
-                            {/* Mini CTA Sidebar */}
-                            <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl p-6 border border-primary/20 text-center">
-                                <h3 className="font-bold text-white text-lg mb-2">Join the Elite</h3>
-                                <p className="text-xs text-gray-400 mb-4">Get daily signals and premium analysis.</p>
-                                <Link to="/register">
-                                    <Button size="sm" className="w-full">Sign Up Free</Button>
-                                </Link>
-                            </div>
                         </div>
                     </div>
 
                 </div>
-            </div>
+            </section>
+
+            {/* SECTION 2: News & Economic Calendar (50/50 Split) */}
+            <section className="py-12 bg-surface/30 w-full border-y border-gray-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+                        {/* News Column */}
+                        <div>
+                            <SectionHeader title="Breaking Market News" link="/news" linkText="Read All" />
+                            <div className="space-y-4">
+                                {latestNews.map(item => (
+                                    <Link key={item.id} to={`/news/${item.id}`} className="block group">
+                                        <div className="bg-background rounded-lg p-4 border border-gray-800 hover:border-gray-600 transition-colors flex items-start gap-4">
+                                            <div className="flex-grow">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`w-2 h-2 rounded-full ${item.impact === 'High' ? 'bg-red-500 animate-pulse' :
+                                                            item.impact === 'Medium' ? 'bg-orange-500' :
+                                                                'bg-green-500'
+                                                        }`}></span>
+                                                    <span className="text-xs text-gray-400">
+                                                        {item.timestamp?.seconds ? new Date(item.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
+                                                    </span>
+                                                </div>
+                                                <h3 className="text-base font-bold text-white group-hover:text-primary transition-colors line-clamp-1">{item.title}</h3>
+                                                <div className="flex gap-2 mt-2">
+                                                    {item.currencies?.slice(0, 3).map(curr => (
+                                                        <span key={curr} className="text-[10px] text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded">{curr}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Calendar Column */}
+                        <div>
+                            <div className="flex justify-between items-end mb-8">
+                                <h2 className="text-3xl font-bold text-white border-l-4 border-secondary pl-4">Economic Calendar</h2>
+                                <Link to="/calendar" className="text-secondary hover:text-yellow-400 font-medium flex items-center gap-1 transition-colors">
+                                    Full Calendar
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </Link>
+                            </div>
+                            <div className="bg-background rounded-xl border border-gray-800 overflow-hidden h-full">
+                                <EconomicCalendar compact={true} />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
 
             {/* Academy & Community CTA (Full Width) */}
             <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full border-t border-gray-800 mt-8">
