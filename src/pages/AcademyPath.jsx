@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { db } from '../firebase/config';
 import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import SEO from '../components/SEO';
 
 const AcademyPath = () => {
     const { path } = useParams();
@@ -37,6 +38,7 @@ const AcademyPath = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+            <SEO title={`${decodedPath} Courses`} description={`Browse our comprehensive ${decodedPath} trading courses to master your skills.`} />
             <div className="mb-8">
                 <Link to="/academy" className="text-gray-500 hover:text-white mb-4 inline-block">&larr; Back to Academy</Link>
                 <h1 className="text-3xl font-bold text-white"><span className="text-primary">{decodedPath}</span> Courses</h1>

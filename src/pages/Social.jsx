@@ -3,6 +3,7 @@ import { db, auth } from '../firebase/config';
 import { collection, query, orderBy, onSnapshot, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, limit } from 'firebase/firestore';
 import CreatePost from '../components/social/CreatePost';
 import PostCard from '../components/social/PostCard';
+import SEO from '../components/SEO';
 import { Link } from 'react-router-dom';
 
 const Social = () => {
@@ -125,6 +126,7 @@ const Social = () => {
 
     return (
         <div className="min-h-screen bg-background pt-20 pb-10">
+            <SEO title="Traders Community" description="Connect with other traders, share ideas, and grow your network on ForexVolcano." />
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
                 {/* Header */}

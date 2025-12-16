@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 
 const AnalysisDetail = () => {
     const { id } = useParams();
@@ -47,6 +48,11 @@ const AnalysisDetail = () => {
 
     return (
         <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+            <SEO
+                title={`${post.title} - Analysis`}
+                description={post.content ? post.content.replace(/<[^>]*>?/gm, '').substring(0, 150) + "..." : "Read full analysis"}
+                image={post.image || post.chart_image_url}
+            />
             <div className="max-w-4xl mx-auto">
                 <Button variant="ghost" onClick={() => navigate('/analysis')} className="mb-6 text-gray-400 hover:text-white">
                     ← Back to Analysis

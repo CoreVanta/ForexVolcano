@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 
 const NewsDetail = () => {
     const { id } = useParams();
@@ -45,6 +46,11 @@ const NewsDetail = () => {
 
     return (
         <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+            <SEO
+                title={`${newsItem.title} - Market News`}
+                description={newsItem.content ? newsItem.content.replace(/<[^>]*>?/gm, '').substring(0, 150) + "..." : "Read breaking news"}
+                image={newsItem.image}
+            />
             <div className="max-w-4xl mx-auto">
                 <Button variant="ghost" onClick={() => navigate('/news')} className="mb-6 text-gray-400 hover:text-white">
                     ← Back to News

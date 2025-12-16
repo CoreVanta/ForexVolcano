@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -55,6 +56,7 @@ const Login = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <SEO title="Login" description="Sign in to your ForexVolcano account to access premium analysis and courses." />
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
                     Sign in to <span className="text-secondary">Volcano</span>

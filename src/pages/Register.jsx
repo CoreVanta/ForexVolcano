@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, sign
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -73,6 +74,7 @@ const Register = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <SEO title="Register" description="Join ForexVolcano today and start your journey to profitable trading." />
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
                     Join the <span className="text-secondary">Eruption</span>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, getDocs, query, orderBy, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth } from '../firebase/config';
+import SEO from '../components/SEO';
 
 const AcademyCourse = () => {
     const { path, courseId } = useParams();
@@ -92,6 +93,7 @@ const AcademyCourse = () => {
 
     return (
         <div className="flex bg-background overflow-hidden animate-fade-in" style={{ height: 'calc(100vh - 64px)' }}>
+            <SEO title={`${course.title} - Academy`} description={course.description} image={course.image} />
             {/* Sidebar: Lesson List */}
             <div className={`${sidebarOpen ? 'w-80' : 'w-0'} bg-surface border-r border-gray-800 transition-all duration-300 flex flex-col flex-shrink-0 relative`}>
                 <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/50">

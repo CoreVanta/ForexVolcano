@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { db, auth } from '../firebase/config';
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc, onSnapshot } from 'firebase/firestore';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 
 const UserProfile = () => {
     const { username } = useParams();
@@ -103,6 +104,11 @@ const UserProfile = () => {
 
     return (
         <div className="min-h-screen bg-background pt-20 px-4 animate-fade-in">
+            <SEO
+                title={`${profile.username} (@${profile.username})`}
+                description={profile.bio || `Check out ${profile.username}'s profile on ForexVolcano.`}
+                image={profile.avatar_url}
+            />
             <div className="max-w-3xl mx-auto bg-surface rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
                 {/* Header / Banner */}
                 <div className="h-32 bg-gradient-to-r from-primary/20 to-secondary/20 relative"></div>

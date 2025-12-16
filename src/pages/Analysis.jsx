@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 import { auth, db } from '../firebase/config';
 import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 
@@ -102,6 +103,11 @@ const Analysis = () => {
 
     return (
         <div className="bg-background min-h-screen py-12">
+            <SEO
+                title="Market Analysis"
+                description="Expert technical and fundamental analysis for Forex, Commodities, and Indices."
+                keywords="forex analysis, gold analysis, technical analysis, trading signals"
+            />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-extrabold text-white sm:text-5xl tracking-tight">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
+import SEO from '../components/SEO';
 
 const Academy = () => {
     const [paths, setPaths] = useState([]);
@@ -41,6 +42,7 @@ const Academy = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+            <SEO title="Trading Academy" description="Master the markets with our comprehensive trading courses and learning paths." />
             <h1 className="text-4xl font-bold text-white mb-2">My Academy</h1>
             <p className="text-gray-400 mb-10">Choose a learning path to start your journey.</p>
 
