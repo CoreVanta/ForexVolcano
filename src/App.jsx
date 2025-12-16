@@ -28,6 +28,9 @@ const UserProfile = React.lazy(() => import('./pages/UserProfile'));
 const MarketAll = React.lazy(() => import('./pages/MarketAll'));
 const PairDetails = React.lazy(() => import('./pages/PairDetails'));
 const CalendarPage = React.lazy(() => import('./pages/CalendarPage'));
+const About = React.lazy(() => import('./pages/About'));
+const Contact = React.lazy(() => import('./pages/Contact'));
+const Privacy = React.lazy(() => import('./pages/Privacy'));
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -69,6 +72,9 @@ function App() {
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy" element={<Privacy />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
