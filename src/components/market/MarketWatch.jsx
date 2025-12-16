@@ -49,9 +49,9 @@ const MarketWatch = () => {
 
     return (
         <div className="bg-surface rounded-xl border border-gray-800 overflow-hidden">
-            <div className="p-4 border-b border-gray-800 bg-gray-900/50">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            <div className="px-3 py-2 border-b border-gray-800 bg-gray-900/50">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
                     Live Market
                 </h3>
             </div>
@@ -61,16 +61,16 @@ const MarketWatch = () => {
                     <Link
                         key={pair.symbol}
                         to={`/market/${pair.symbol}`}
-                        className="flex justify-between items-center p-4 hover:bg-gray-800/50 transition-colors group"
+                        className="flex justify-between items-center px-3 py-2 hover:bg-gray-800/50 transition-colors group"
                     >
                         <div>
-                            <span className="font-bold text-white block group-hover:text-primary transition-colors">{pair.symbol}</span>
-                            <span className={`text-xs ${pair.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            <span className="font-bold text-sm text-white block group-hover:text-primary transition-colors">{pair.symbol}</span>
+                            <span className={`text-[10px] ${pair.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                 {pair.change >= 0 ? '+' : ''}{pair.change.toFixed(2)}%
                             </span>
                         </div>
                         <div className="text-right">
-                            <div className={`font-mono text-sm font-medium ${pair.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            <div className={`font-mono text-xs font-medium ${pair.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                 {formatPrice(pair.price, pair.symbol)}
                             </div>
                         </div>
@@ -78,9 +78,9 @@ const MarketWatch = () => {
                 ))}
             </div>
 
-            <div className="p-3 bg-gray-900/50 text-center border-t border-gray-800">
-                <Link to="/market" className="text-xs text-primary font-bold hover:underline">
-                    View All Markets &rarr;
+            <div className="p-2 bg-gray-900/50 text-center border-t border-gray-800">
+                <Link to="/market" className="text-[10px] text-primary font-bold hover:underline">
+                    View All &rarr;
                 </Link>
             </div>
         </div>
