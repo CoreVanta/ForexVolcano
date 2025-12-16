@@ -7,11 +7,7 @@ const INITIAL_PAIRS = [
     { symbol: 'USDJPY', price: 148.20, change: 0.32 },
     { symbol: 'XAUUSD', price: 2035.50, change: 0.85 },
     { symbol: 'BTCUSD', price: 42500.00, change: 1.20 },
-    { symbol: 'AUDUSD', price: 0.6580, change: -0.12 },
-    { symbol: 'USDCAD', price: 1.3450, change: 0.08 },
-    { symbol: 'NZDUSD', price: 0.6120, change: -0.25 },
-    { symbol: 'USDCHF', price: 0.8790, change: 0.10 },
-    { symbol: 'WTI', price: 76.50, change: 0.50 }
+    { symbol: 'AUDUSD', price: 0.6580, change: -0.12 }
 ];
 
 const MarketWatch = () => {
