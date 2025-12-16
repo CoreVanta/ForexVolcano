@@ -3,11 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { useTheme } from '../context/ThemeContext';
 
 const Navbar = () => {
     const [user, setUser] = useState(null);
-    const { theme, toggleTheme } = useTheme();
     const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 

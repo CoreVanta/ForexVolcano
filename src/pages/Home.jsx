@@ -68,7 +68,7 @@ const Home = () => {
                     <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6">
                         Predict the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Eruption</span>
                     </h1>
-                    <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
+                    <p className="text-xl text-gray-400 mb-10 leading-relaxed max-w-2xl">
                         Your all-in-one platform for professional market analysis, breaking news, and comprehensive trading education. Join thousands of traders leveling up their game.
                     </p>
                     <div className="flex flex-wrap gap-4">
@@ -86,8 +86,8 @@ const Home = () => {
 
     const SectionHeader = ({ title, link, linkText, variant = 'primary' }) => (
         <div className="flex justify-between items-end mb-8">
-            <h2 className={`text-2xl md:text-3xl font-bold text-text border-l-4 pl-4 ${variant === 'secondary' ? 'border-secondary' : 'border-primary'}`}>{title}</h2>
-            <Link to={link} className={`${variant === 'secondary' ? 'text-secondary hover:text-yellow-500' : 'text-primary hover:text-green-500'} font-medium flex items-center gap-1 transition-colors text-sm md:text-base`}>
+            <h2 className={`text-2xl md:text-3xl font-bold text-white border-l-4 pl-4 ${variant === 'secondary' ? 'border-secondary' : 'border-primary'}`}>{title}</h2>
+            <Link to={link} className={`${variant === 'secondary' ? 'text-secondary hover:text-yellow-400' : 'text-primary hover:text-green-400'} font-medium flex items-center gap-1 transition-colors text-sm md:text-base`}>
                 {linkText}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -116,7 +116,7 @@ const Home = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {latestAnalysis.map(item => (
                                 <Link key={item.id} to={`/analysis/${item.id}`} className="group block h-full">
-                                    <div className="bg-surface rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 h-full hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-primary/10 flex flex-col">
+                                    <div className="bg-surface rounded-xl overflow-hidden border border-gray-800 h-full hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-primary/10 flex flex-col">
                                         <div className="h-40 overflow-hidden relative">
                                             <img
                                                 src={item.image}
@@ -137,8 +137,8 @@ const Home = () => {
                                                     {item.createdAt?.seconds ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'Today'}
                                                 </span>
                                             </div>
-                                            <h3 className="text-base font-bold text-text mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-tight">{item.title}</h3>
-                                            <p className="text-text-muted text-xs line-clamp-2 mt-auto">{stripHtml(item.content).substring(0, 80)}...</p>
+                                            <h3 className="text-base font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-tight">{item.title}</h3>
+                                            <p className="text-gray-400 text-xs line-clamp-2 mt-auto">{stripHtml(item.content).substring(0, 80)}...</p>
                                         </div>
                                     </div>
                                 </Link>
@@ -148,7 +148,7 @@ const Home = () => {
 
                     {/* Right: Market Watch (1 Column wide) */}
                     <div className="lg:col-span-1 mt-12 lg:mt-0">
-                        <div className="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-1">
+                        <div className="bg-surface rounded-xl border border-gray-800 p-1">
                             <MarketWatch />
                         </div>
                     </div>
@@ -200,7 +200,7 @@ const Home = () => {
                             <div className="space-y-4">
                                 {latestNews.map(item => (
                                     <Link key={item.id} to={`/news/${item.id}`} className="block group">
-                                        <div className="bg-surface rounded-lg p-4 border border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 transition-colors flex items-start gap-4">
+                                        <div className="bg-surface rounded-lg p-4 border border-gray-800 hover:border-gray-600 transition-colors flex items-start gap-4">
                                             <div className="flex-grow">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className={`w-2 h-2 rounded-full ${item.impact === 'High' ? 'bg-red-500 animate-pulse' :
@@ -211,10 +211,10 @@ const Home = () => {
                                                         {item.timestamp?.seconds ? new Date(item.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
                                                     </span>
                                                 </div>
-                                                <h3 className="text-base font-bold text-text group-hover:text-primary transition-colors line-clamp-1">{item.title}</h3>
+                                                <h3 className="text-base font-bold text-white group-hover:text-primary transition-colors line-clamp-1">{item.title}</h3>
                                                 <div className="flex gap-2 mt-2">
                                                     {item.currencies?.slice(0, 3).map(curr => (
-                                                        <span key={curr} className="text-[10px] text-text-muted bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">{curr}</span>
+                                                        <span key={curr} className="text-[10px] text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded">{curr}</span>
                                                     ))}
                                                 </div>
                                             </div>
@@ -237,22 +237,22 @@ const Home = () => {
             </section>
 
             {/* Academy & Community CTA (Full Width) */}
-            <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full border-t border-gray-200 dark:border-gray-800 mt-8">
+            <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full border-t border-gray-800 mt-8">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-4xl font-bold text-text mb-6">Level Up Your Trading Skills</h2>
-                    <p className="text-text-muted text-lg mb-12 max-w-2xl mx-auto">
+                    <h2 className="text-4xl font-bold text-white mb-6">Level Up Your Trading Skills</h2>
+                    <p className="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
                         Join our comprehensive academy with courses designed for every level. From interpreting candlestick patterns to mastering complex strategies.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 text-left">
                         {featuredCourses.slice(0, 2).map(course => (
-                            <div key={course.id} className="flex items-center gap-4 bg-surface p-4 rounded-xl border border-gray-200 dark:border-gray-800">
+                            <div key={course.id} className="flex items-center gap-4 bg-surface p-4 rounded-xl border border-gray-800">
                                 <div className="h-20 w-32 rounded-lg overflow-hidden flex-shrink-0">
                                     <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-text text-lg">{course.title}</h4>
-                                    <p className="text-sm text-text-muted">{course.lessons?.length || 0} Lessons • {course.level || 'All Levels'}</p>
+                                    <h4 className="font-bold text-white text-lg">{course.title}</h4>
+                                    <p className="text-sm text-gray-500">{course.lessons?.length || 0} Lessons • {course.level || 'All Levels'}</p>
                                 </div>
                             </div>
                         ))}
