@@ -84,10 +84,10 @@ const Home = () => {
         </div>
     );
 
-    const SectionHeader = ({ title, link, linkText }) => (
+    const SectionHeader = ({ title, link, linkText, variant = 'primary' }) => (
         <div className="flex justify-between items-end mb-8">
-            <h2 className="text-3xl font-bold text-white border-l-4 border-primary pl-4">{title}</h2>
-            <Link to={link} className="text-primary hover:text-green-400 font-medium flex items-center gap-1 transition-colors">
+            <h2 className={`text-2xl md:text-3xl font-bold text-white border-l-4 pl-4 ${variant === 'secondary' ? 'border-secondary' : 'border-primary'}`}>{title}</h2>
+            <Link to={link} className={`${variant === 'secondary' ? 'text-secondary hover:text-yellow-400' : 'text-primary hover:text-green-400'} font-medium flex items-center gap-1 transition-colors text-sm md:text-base`}>
                 {linkText}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
