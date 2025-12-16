@@ -156,8 +156,9 @@ const Social = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-                    {/* Left Sidebar (Profile) - Hidden on mobile */}
-                    <div className="hidden lg:block col-span-1">
+                    {/* Left Sidebar (Profile & Suggestions) */}
+                    <div className="hidden lg:flex flex-col gap-6 col-span-1">
+                        {/* Profile Card */}
                         <div className="bg-surface rounded-xl border border-gray-800 p-6 sticky top-24">
                             <div className="flex flex-col items-center">
                                 <Link to={`/profile/${auth.currentUser?.displayName}`} className="h-20 w-20 rounded-full bg-gray-700 overflow-hidden mb-4">
@@ -174,11 +175,37 @@ const Social = () => {
                                     <span className="text-white font-bold">{userFriends.length}</span>
                                 </div>
                             </div>
+
+                            {/* Suggested Users (Moved Inside Sidebar) */}
+                            <div className="mt-8 pt-8 border-t border-gray-800">
+                                <h3 className="text-white font-bold mb-4">Suggested People</h3>
+                                <div className="space-y-4">
+                                    {suggestedUsers.length > 0 ? (
+                                        suggestedUsers.map(user => (
+                                            <div key={user.id} className="flex items-center justify-between">
+                                                <Link to={`/profile/${user.username}`} className="flex items-center gap-3 group">
+                                                    <div className="h-10 w-10 rounded-full bg-gray-700 overflow-hidden">
+                                                        <img src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}`} alt={user.username} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <div className="max-w-[100px]">
+                                                        <p className="text-sm font-bold text-white truncate group-hover:underline">{user.username}</p>
+                                                    </div>
+                                                </Link>
+                                                <Link to={`/profile/${user.username}`} className="text-primary text-xs hover:underline">
+                                                    View
+                                                </Link>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-xs text-gray-500">No suggestions available right now.</p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Main Content (Feed) */}
-                    <div className="col-span-1 lg:col-span-2">
+                    {/* Main Content (Feed) - Taking remaining space */}
+                    <div className="col-span-1 lg:col-span-3">
                         {activeTab === 'feed' && (
                             <>
                                 <CreatePost />
@@ -228,34 +255,6 @@ const Social = () => {
                                 )}
                             </div>
                         )}
-                    </div>
-
-                    {/* Right Sidebar (Suggested Friends) */}
-                    <div className="hidden lg:block col-span-1">
-                        <div className="bg-surface rounded-xl border border-gray-800 p-6 sticky top-24">
-                            <h3 className="text-white font-bold mb-4">Suggested People</h3>
-                            <div className="space-y-4">
-                                {suggestedUsers.length > 0 ? (
-                                    suggestedUsers.map(user => (
-                                        <div key={user.id} className="flex items-center justify-between">
-                                            <Link to={`/profile/${user.username}`} className="flex items-center gap-3 group">
-                                                <div className="h-10 w-10 rounded-full bg-gray-700 overflow-hidden">
-                                                    <img src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}`} alt={user.username} className="w-full h-full object-cover" />
-                                                </div>
-                                                <div className="max-w-[100px]">
-                                                    <p className="text-sm font-bold text-white truncate group-hover:underline">{user.username}</p>
-                                                </div>
-                                            </Link>
-                                            <Link to={`/profile/${user.username}`} className="text-primary text-xs hover:underline">
-                                                View
-                                            </Link>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-xs text-gray-500">No suggestions available right now.</p>
-                                )}
-                            </div>
-                        </div>
                     </div>
 
                 </div>
