@@ -157,7 +157,7 @@ const Home = () => {
             </section>
 
             {/* SECTION 2: News & Economic Calendar (50/50 Split) */}
-            <section className="py-12 bg-surface/30 w-full border-y border-gray-800">
+            <section className="py-12 w-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
@@ -167,7 +167,7 @@ const Home = () => {
                             <div className="space-y-4">
                                 {latestNews.map(item => (
                                     <Link key={item.id} to={`/news/${item.id}`} className="block group">
-                                        <div className="bg-background rounded-lg p-4 border border-gray-800 hover:border-gray-600 transition-colors flex items-start gap-4">
+                                        <div className="bg-surface rounded-lg p-4 border border-gray-800 hover:border-gray-600 transition-colors flex items-start gap-4">
                                             <div className="flex-grow">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className={`w-2 h-2 rounded-full ${item.impact === 'High' ? 'bg-red-500 animate-pulse' :
@@ -193,15 +193,7 @@ const Home = () => {
 
                         {/* Calendar Column */}
                         <div>
-                            <div className="flex justify-between items-end mb-8">
-                                <h2 className="text-3xl font-bold text-white border-l-4 border-secondary pl-4">Economic Calendar</h2>
-                                <Link to="/calendar" className="text-secondary hover:text-yellow-400 font-medium flex items-center gap-1 transition-colors">
-                                    Full Calendar
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                    </svg>
-                                </Link>
-                            </div>
+                            <SectionHeader title="Economic Calendar" link="/calendar" linkText="Full Calendar" variant="secondary" />
                             <div className="bg-background rounded-xl border border-gray-800 overflow-hidden h-full">
                                 <EconomicCalendar compact={true} />
                             </div>
