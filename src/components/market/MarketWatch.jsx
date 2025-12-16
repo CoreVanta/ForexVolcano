@@ -63,8 +63,8 @@ const MarketWatch = () => {
                         to={`/market/${pair.symbol}`}
                         className="flex justify-between items-center px-3 py-2 hover:bg-gray-800/50 transition-colors group"
                     >
-                        <div>
-                            <span className="font-bold text-sm text-white block group-hover:text-primary transition-colors">{pair.symbol}</span>
+                        <div className="flex flex-col leading-none gap-0.5">
+                            <span className="font-bold text-sm text-white group-hover:text-primary transition-colors">{pair.symbol}</span>
                             <span className={`text-[10px] ${pair.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                 {pair.change >= 0 ? '+' : ''}{pair.change.toFixed(2)}%
                             </span>
