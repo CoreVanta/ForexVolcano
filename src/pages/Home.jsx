@@ -107,7 +107,7 @@ const Home = () => {
             <Hero />
 
             {/* SECTION 1: Analysis & Market Watch */}
-            <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <section className="pt-12 pb-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
 
                     {/* Left: Latest Market Analysis (3 Columns wide) */}
@@ -157,7 +157,7 @@ const Home = () => {
             </section>
 
             {/* SECTION 1.5: Community & Ad (2/3 Community, 1/3 Ad) */}
-            <section className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <section className="py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     {/* Community (2/3) */}
@@ -190,7 +190,7 @@ const Home = () => {
             </section>
 
             {/* SECTION 2: News & Economic Calendar (50/50 Split) */}
-            <section className="py-12 w-full">
+            <section className="pt-4 pb-12 w-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
