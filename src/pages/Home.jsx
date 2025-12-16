@@ -5,6 +5,7 @@ import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import Button from '../components/ui/Button';
 import SEO from '../components/SEO';
 import MarketWatch from '../components/market/MarketWatch';
+import EconomicCalendar from '../components/market/EconomicCalendar';
 
 const Home = () => {
     const [latestAnalysis, setLatestAnalysis] = useState([]);
@@ -184,6 +185,15 @@ const Home = () => {
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 space-y-8">
                             <MarketWatch />
+
+                            {/* Economic Calendar Widget */}
+                            <div className="bg-surface rounded-xl border border-gray-800 overflow-hidden">
+                                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/50">
+                                    <h3 className="font-bold text-white text-sm">Economic Events</h3>
+                                    <Link to="/calendar" className="text-xs text-primary hover:underline">View All</Link>
+                                </div>
+                                <EconomicCalendar compact={true} />
+                            </div>
 
                             {/* Mini CTA Sidebar */}
                             <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl p-6 border border-primary/20 text-center">
