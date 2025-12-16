@@ -3,12 +3,24 @@ import { Link } from 'react-router-dom';
 import { db } from '../firebase/config';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 
 const Home = () => {
     const [latestAnalysis, setLatestAnalysis] = useState([]);
     const [latestNews, setLatestNews] = useState([]);
     const [featuredCourses, setFeaturedCourses] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Helper to strip HTML tags
+    const stripHtml = (html) => {
+        if (!html) return "";
+        const htmlWithSpaces = html.replace(/<\/p>/gi, ' ')
+            .replace(/<\/div>/gi, ' ')
+            .replace(/<br\s*\/?>/gi, ' ');
+        const tmp = document.createElement("DIV");
+        tmp.innerHTML = htmlWithSpaces;
+        return (tmp.textContent || tmp.innerText || "").trim();
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -18,8 +30,8 @@ const Home = () => {
                 const analysisSnap = await getDocs(analysisQ);
                 setLatestAnalysis(analysisSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-                // Fetch Latest News
-                const newsQ = query(collection(db, 'news'), orderBy('date', 'desc'), limit(3));
+                // Fetch Latest News - FIXED orderBy 'timestamp'
+                const newsQ = query(collection(db, 'news'), orderBy('timestamp', 'desc'), limit(3));
                 const newsSnap = await getDocs(newsQ);
                 setLatestNews(newsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
@@ -52,7 +64,7 @@ const Home = () => {
             <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
                 <div className="max-w-3xl animate-fade-in-up">
                     <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6">
-                        Master the Markets with <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">ForexVolcano</span>
+                        Predict the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Eruption</span>
                     </h1>
                     <p className="text-xl text-gray-400 mb-10 leading-relaxed max-w-2xl">
                         Your all-in-one platform for professional market analysis, breaking news, and comprehensive trading education. Join thousands of traders leveling up their game.
@@ -86,6 +98,10 @@ const Home = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-background">
+            <SEO
+                title="Home"
+                description="ForexVolcano: The ultimate platform for professional forex analysis, real-time market news, and expert trading courses. Predict the market eruption with us."
+            />
             <Hero />
 
             {/* Latest Analysis */}
@@ -97,7 +113,7 @@ const Home = () => {
                             <div className="bg-surface rounded-xl overflow-hidden border border-gray-800 h-full hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-primary/10">
                                 <div className="h-48 overflow-hidden relative">
                                     <img
-                                        src={item.imageUrl}
+                                        src={item.image /* FIXED image property source */}
                                         alt={item.title}
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
@@ -116,7 +132,7 @@ const Home = () => {
                                         </span>
                                     </div>
                                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-2">{item.title}</h3>
-                                    <p className="text-gray-400 text-sm line-clamp-3">{item.content?.substring(0, 100)}...</p>
+                                    <p className="text-gray-400 text-sm line-clamp-3">{stripHtml(item.content).substring(0, 100)}...</p>
                                 </div>
                             </div>
                         </Link>
@@ -134,12 +150,15 @@ const Home = () => {
                                 <div className="bg-background rounded-xl p-6 border border-gray-800 hover:border-gray-600 transition-colors h-full flex flex-col">
                                     <div className="flex justify-between items-start mb-4">
                                         <span className={`px-2 py-1 rounded text-xs font-bold ${item.impact === 'High' ? 'bg-red-500/20 text-red-500' :
-                                                item.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-500' :
-                                                    'bg-green-500/20 text-green-500'
+                                            item.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-500' :
+                                                'bg-green-500/20 text-green-500'
                                             }`}>
                                             {item.impact} Impact
                                         </span>
-                                        <span className="text-xs text-gray-500">{new Date(item.date).toLocaleDateString()}</span>
+                                        {/* FIXED timestamp usage */}
+                                        <span className="text-xs text-gray-500">
+                                            {item.timestamp?.seconds ? new Date(item.timestamp.seconds * 1000).toLocaleDateString() : 'Just now'}
+                                        </span>
                                     </div>
                                     <h3 className="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
                                     <div className="flex gap-2 mt-auto pt-4">
