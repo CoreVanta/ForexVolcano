@@ -33,7 +33,7 @@ const Home = () => {
                 setLatestAnalysis(analysisSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
                 // Fetch Latest News - FIXED orderBy 'timestamp'
-                const newsQ = query(collection(db, 'news'), orderBy('timestamp', 'desc'), limit(3));
+                const newsQ = query(collection(db, 'news'), orderBy('timestamp', 'desc'), limit(5));
                 const newsSnap = await getDocs(newsQ);
                 setLatestNews(newsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
@@ -171,8 +171,8 @@ const Home = () => {
                                             <div className="flex-grow">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className={`w-2 h-2 rounded-full ${item.impact === 'High' ? 'bg-red-500 animate-pulse' :
-                                                            item.impact === 'Medium' ? 'bg-orange-500' :
-                                                                'bg-green-500'
+                                                        item.impact === 'Medium' ? 'bg-orange-500' :
+                                                            'bg-green-500'
                                                         }`}></span>
                                                     <span className="text-xs text-gray-400">
                                                         {item.timestamp?.seconds ? new Date(item.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
